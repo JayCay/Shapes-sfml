@@ -30,8 +30,8 @@ int main( void )
 	color[1] = sf::Color::Green;
 	color[2] = sf::Color::Blue;
 	color[3] = sf::Color::Yellow;
-	color[4] = sf::Color::Magenta;
-	color[5] = sf::Color::Cyan;
+	color[4] = sf::Color::Cyan;
+	color[5] = sf::Color::White;
 	sf::CircleShape circ[CirSIZE];
 	sf::RectangleShape rect[RecSIZE];
 	int posw = 0; 
