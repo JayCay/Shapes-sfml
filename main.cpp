@@ -1,5 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cstdlib>
+#include <ctime>
 
 #define FPS 60
 #define CSIZE 6
@@ -58,10 +60,15 @@ int main( void )
 		rect[i].setFillColor( color[curr] );
 	}
 	
-	window.setFramerateLimit( FPS );
+	sf::Clock clock;
+	window.setFramerateLimit( 60 );
+	sf::Time elapsedTime = sf::seconds(0);
+	int tracker = 1;
 	
 	while( window.isOpen() )
     {
+		sf::Time iterationTime = clock.restart();
+		elapsedTime += iterationTime;
 		sf::Event event;
 
         while( window.pollEvent( event ) )
@@ -84,6 +91,20 @@ int main( void )
 		
 		window.display();
 		
+		if(elapsedTime.asSeconds() >= tracker)
+		{
+			for (int i = 0; i < CirSIZE; i++)
+			{
+				circ[i].move(0 , 20);
+			}
+				
+			for (int i = 0; i < RecSIZE; i++)
+			{
+				rect[i].move(20 , 0);
+			}
+			
+		tracker += 1;
+		}
 	}
 	
 	return 0;
