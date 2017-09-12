@@ -62,7 +62,7 @@ int main( void )
 	
 	sf::Clock clock;
 	window.setFramerateLimit( 60 );
-	sf::Time elapsedTime = sf::seconds(0);
+	sf::Time elapsedTime = sf::milliseconds(0);
 	int tracker = 1;
 	
 	while( window.isOpen() )
@@ -91,16 +91,16 @@ int main( void )
 		
 		window.display();
 		
-		if(elapsedTime.asSeconds() >= tracker)
+		if(elapsedTime.asMilliseconds() >= tracker)
 		{
 			for (int i = 0; i < CirSIZE; i++)
 			{
-				circ[i].move(0 , 20);
+				circ[i].move(0 , 0.02);
 			}
 				
 			for (int i = 0; i < RecSIZE; i++)
 			{
-				rect[i].move(20 , 0);
+				rect[i].move(0.02 , 0);
 			}
 			
 		tracker += 1;
