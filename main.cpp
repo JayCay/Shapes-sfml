@@ -1,7 +1,5 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
 
 #define FPS 60
 #define CSIZE 6
@@ -10,23 +8,19 @@
 
 using namespace std;
 
-int colorcycle(int count) 
-{
-	if(count >= CSIZE)
-	{
+int colorcycle( int count ) {
+	if ( count >= CSIZE ) {
 		int n = count % CSIZE;
 		return n;
 	}
-	else 
-		return count;
+	else return count;
 }
 
-int main( void )
-{
+int main( void ) {
 	srand( time( NULL ) );
 	int width = 800;
 	int height = 720;
-    sf::RenderWindow window( sf::VideoMode( width, height ), "test" );
+	sf::RenderWindow window( sf::VideoMode( width, height ), "shapes" );
 	sf::Color color[CSIZE];
 	color[0] = sf::Color::Red;
 	color[1] = sf::Color::Green;
@@ -36,76 +30,61 @@ int main( void )
 	color[5] = sf::Color::White;
 	sf::CircleShape circ[CirSIZE];
 	sf::RectangleShape rect[RecSIZE];
-	int posw = 0; 
-	int posh = 0; 
+	int posw = 0;
+	int posh = 0;
 	int curr = 0;
-	
-	for (int i = 0; i < CirSIZE; i++)
-	{
-		curr = colorcycle(i);
+	float movement = 20.0 / FPS;
+
+	for ( int i = 0; i < CirSIZE; i++ ) {
+		curr = colorcycle( i );
 		posw = rand() % width + 1;
 		posh = rand() % height + 1;
 		circ[i].setRadius( 30.f );
-		circ[i].setPosition(posw, posh);
+		circ[i].setPosition( posw, posh );
 		circ[i].setFillColor( color[curr] );
 	}
-	
-	for (int i = 0; i < RecSIZE; i++)
-	{
-		curr = colorcycle(i);
+
+	for ( int i = 0; i < RecSIZE; i++ ) {
+		curr = colorcycle( i );
 		posw = rand() % width + 1;
 		posh = rand() % height + 1;
 		rect[i].setSize( sf::Vector2f( 50.f, 50.f ) );
-		rect[i].setPosition(posw, posh);
+		rect[i].setPosition( posw, posh );
 		rect[i].setFillColor( color[curr] );
 	}
-	
-	sf::Clock clock;
-	window.setFramerateLimit( 60 );
-	sf::Time elapsedTime = sf::milliseconds(0);
-	int tracker = 1;
-	
-	while( window.isOpen() )
-    {
-		sf::Time iterationTime = clock.restart();
-		elapsedTime += iterationTime;
+
+	window.setFramerateLimit( FPS );
+
+	while ( window.isOpen() ) {
 		sf::Event event;
 
-        while( window.pollEvent( event ) )
-        {
-			if( event.type == sf::Event::Closed )
-			{
+		while ( window.pollEvent( event ) ) {
+			if ( event.type == sf::Event::Closed ) {
 				window.close();
 			}
 		}
-		
+
 		window.clear( sf::Color::Black );
-		
-		for(int n = 0; n < CirSIZE; n++){
+
+		for ( int n = 0; n < CirSIZE; n++ ) {
 			window.draw( circ[n] );
 		}
-		
-		for(int i = 0; i < RecSIZE; i++){
+
+		for ( int i = 0; i < RecSIZE; i++ ) {
 			window.draw( rect[i] );
 		}
-		
+
 		window.display();
-		
-		if(elapsedTime.asMilliseconds() >= tracker)
-		{
-			for (int i = 0; i < CirSIZE; i++)
-			{
-				circ[i].move(0 , 0.02);
-			}
-				
-			for (int i = 0; i < RecSIZE; i++)
-			{
-				rect[i].move(0.02 , 0);
-			}
-			
-		tracker += 1;
+
+		for ( int i = 0; i < CirSIZE; i++ ) {
+			circ[i].move( 0 , movement );
 		}
+
+		for ( int i = 0; i < RecSIZE; i++ ) {
+			rect[i].move( movement, 0 );
+		}
+
 	}
-	
+
 	return 0;
 }
