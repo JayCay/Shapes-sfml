@@ -44,6 +44,7 @@ int main() {
 	color[4] = sf::Color::Cyan;
 	color[5] = sf::Color::White;
 	window.setFramerateLimit( FPS );
+	window.setActive( false );
 	int posw = 0;
 	int posh = 0;
 	int curr = 0;
