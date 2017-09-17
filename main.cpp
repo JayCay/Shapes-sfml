@@ -114,31 +114,56 @@ int main() {
 	    	//get position of mouse and rectangle
 	    	sf::Vector2i mPos = sf::Mouse::getPosition( window );
 	    	sf::Vector2f rPos = rect[0].getPosition();
-	    	
-	    	//prints out mouse coordinates
-	    	//cout << "Mouse Coordinates: " << mPos.x << ", " << mPos.y << endl;
-			
-	    	//moves rectangle depending on mouse position
-	    	if(rPos.x > mPos.x){
-	    	rect[0].move(-circleInput, 0);
+
+	    	//makes the basis for checking distance the center of the rectangle
+	    	int rPosix = rPos.x + 25;
+	    	int rPosiy = rPos.y + 25; 
+
+	    	//no movement if both x and y values are 3 pixels apart
+	    	if((rPosix - mPos.x < 3 && rPosix - mPos.x > -3) && (rPosiy - mPos.y < 3 && rPosiy - mPos.y > -3)){
+	    		rect[0].move(0,0);
 	    	}
-	    	if(rPos.x < mPos.x){
-	    	rect[0].move(circleInput,0);
-	    	}
-	    	if(rPos.y > mPos.y){
-	    	rect[0].move(0,-circleInput);
-	    	}
-	    	if(rPos.y < mPos.y){
-	    	rect[0].move(0,circleInput);
-	    	}
+	    	//movement if only the y value is 3 pixels apart
+	    	else if(rPosiy - mPos.y < 3 && rPosiy - mPos.y > -3){
+	    			if(rPosix > mPos.x){
+	    			rect[0].move(-circleInput, 0);
+	    			}
+	    			if(rPosix < mPos.x){
+	    			rect[0].move(circleInput,0);
+	    			}
+	    		}
+	    	//movement if only the x value is 3 pixels apart
+	    	else if(rPosix - mPos.x < 3 && rPosix - mPos.x > -3){
+	    				if(rPosiy > mPos.y){
+	    				rect[0].move(0,-circleInput);
+	    				}
+	    				if(rPosiy < mPos.y){
+	    				rect[0].move(0,circleInput);
+	    				}
+	    			}
+	    	//movement when both are more than 3 pixels apart
+	    	else{
+
+	    		if(rPosix > mPos.x){
+	    			rect[0].move(-circleInput, 0);
+	    		}
+	    		if(rPosix < mPos.x){
+	    			rect[0].move(circleInput,0);
+	    		}
+	    	 	if(rPosiy > mPos.y){
+	    			rect[0].move(0,-circleInput);
+	    		}
+	    		if(rPosiy < mPos.y){
+	    			rect[0].move(0,circleInput);
+	    		}
+	    	}	
+	    		  
+
+	   			 
 		}
 
-        /**if ( buttonLeftPressed ) {
-            cout << "mouse coords: " << sf::Mouse::getPosition(window);
-            //<< event.mouseButton.x << ", " << event.mouseButton.y << endl;
-        rect[0].move(circleInput,0);
-         }
-         **/
+      
+       
 
         // draw game to screen
         window.clear( sf::Color::Black );
