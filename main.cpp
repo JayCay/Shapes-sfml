@@ -1,6 +1,7 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
+
 using namespace std;
 
 // DEFINES
@@ -50,6 +51,8 @@ int main() {
     float circleInput = 200.0/FPS;
     float autoMovement = 20.0/FPS;
 
+
+
     // initialise drawing circles
     for ( int i = 0; i < numCircle; i++ ) {
         circ[i].setRadius( 30.f );
@@ -88,6 +91,7 @@ int main() {
             // mouse
             if ( event.type == sf::Event::MouseButtonPressed ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = true;
             if ( event.type == sf::Event::MouseButtonReleased ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = false;
+
         }
 
         if ( keyClosePressed ) {
@@ -105,9 +109,37 @@ int main() {
         if ( keyLeftPressed ) circ[0].move( -circleInput, 0 );
         if ( keyRightPressed ) circ[0].move( circleInput, 0 );
         // rect[0] input        
-        if ( buttonLeftPressed ) {
-            cout << "mouse coords: " << event.mouseButton.x << ", " << event.mouseButton.y << endl;
-        }
+		if (buttonLeftPressed) 
+		{
+	    	//get position of mouse and rectangle
+	    	sf::Vector2i mPos = sf::Mouse::getPosition( window );
+	    	sf::Vector2f rPos = rect[0].getPosition();
+	    	
+	    	//prints out mouse coordinates
+	    	//cout << "Mouse Coordinates: " << mPos.x << ", " << mPos.y << endl;
+			
+	    	//moves rectangle depending on mouse position
+	    	if(rPos.x > mPos.x){
+	    	rect[0].move(-circleInput, 0);
+	    	}
+	    	if(rPos.x < mPos.x){
+	    	rect[0].move(circleInput,0);
+	    	}
+	    	if(rPos.y > mPos.y){
+	    	rect[0].move(0,-circleInput);
+	    	}
+	    	if(rPos.y < mPos.y){
+	    	rect[0].move(0,circleInput);
+	    	}
+		}
+
+        /**if ( buttonLeftPressed ) {
+            cout << "mouse coords: " << sf::Mouse::getPosition(window);
+            //<< event.mouseButton.x << ", " << event.mouseButton.y << endl;
+        rect[0].move(circleInput,0);
+         }
+         **/
+
         // draw game to screen
         window.clear( sf::Color::Black );
         for ( int n = 0; n < numCircle; n++ ) window.draw( circ[n] );
