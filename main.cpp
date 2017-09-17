@@ -1,139 +1,119 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 
-#define FPS 60
-#define CSIZE 6
-#define CirSIZE 60
-#define RecSIZE 40
-
 using namespace std;
 
-sf::CircleShape circ[CirSIZE];
-sf::RectangleShape rect[RecSIZE];
-float movement = 20.0 / FPS;
-
-// keybinding
+// DEFINES
+#define FPS 60
+#define numCircle 60
+#define numRect 40
+#define numColor 6
+// keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
 #define keyLeft sf::Keyboard::A
 #define keyRight sf::Keyboard::D
-#define keyQuit sf::Keyboard::Escape
+#define keyClose sf::Keyboard::Escape
 
 int colorcycle( int count ) {
-	if ( count >= CSIZE ) {
-		int n = count % CSIZE;
-		return n;
-	}
-	else return count;
-}
-
-void threader( sf::RenderWindow* window ) {
-	while(window->isOpen()) {
-		window->clear( sf::Color::Black );
-		for ( int n = 0; n < CirSIZE; n++ ) window->draw( circ[n] );
-		for ( int i = 0; i < RecSIZE; i++ ) window->draw( rect[i] );
-		window->display();
-		// only moves 2nd to n objects (1 to size)
-		for ( int i = 1; i < CirSIZE; i++ ) circ[i].move( 0 , movement );
-		for ( int i = 1; i < RecSIZE; i++ ) rect[i].move( movement, 0 );
-	}
+    if ( count >= numColor ) {
+        int n = count % numColor;
+        return n;
+    }
+    else return count;
 }
 
 int main() {
-	srand( time( NULL ) );
-	int width = 800;
-	int height = 720;
-	sf::RenderWindow window( sf::VideoMode( width, height ), "shapes v2" );
-	sf::Color color[CSIZE];
-	color[0] = sf::Color::Red;
-	color[1] = sf::Color::Green;
-	color[2] = sf::Color::Blue;
-	color[3] = sf::Color::Yellow;
-	color[4] = sf::Color::Cyan;
-	color[5] = sf::Color::White;
-	window.setFramerateLimit( FPS );
-	window.setActive( false );
-	int posw = 0;
-	int posh = 0;
-	int curr = 0;
-	bool keyUpPressed = false;
-	bool keyDownPressed = false;
-	bool keyLeftPressed = false;
-	bool keyRightPressed = false;
-	bool keyQuitPressed = false;
-	
-	for ( int i = 0; i < CirSIZE; i++ ) {
-		curr = colorcycle( i );
-		posw = rand() % width + 1;
-		posh = rand() % height + 1;
-		circ[i].setRadius( 30.f );
-		circ[i].setPosition( posw, posh );
-		circ[i].setFillColor( color[curr] );
-	}
+    srand( time( NULL ) );
+    int width = 800; int height = 720;
+    sf::RenderWindow window( sf::VideoMode( width, height ), "shapes v3" );
+    window.setFramerateLimit( FPS );
+    window.setActive( false );
+    sf::CircleShape circ[numCircle];
+    sf::RectangleShape rect[numRect];
+    // colors
+    sf::Color color[numColor];
+    color[0] = sf::Color::Red;
+    color[1] = sf::Color::Green;
+    color[2] = sf::Color::Blue;
+    color[3] = sf::Color::Yellow;
+    color[4] = sf::Color::Cyan;
+    color[5] = sf::Color::White;
+    // input booleans
+    bool keyUpPressed = false;
+    bool keyDownPressed = false;
+    bool keyLeftPressed = false;
+    bool keyRightPressed = false;
+    bool keyClosePressed = false;
+    bool buttonLeftPressed = false;
+    // movement constants
+    float circleInput = 200.0/FPS;
+    float autoMovement = 20.0/FPS;
 
-	for ( int i = 0; i < RecSIZE; i++ ) {
-		curr = colorcycle( i );
-		posw = rand() % width + 1;
-		posh = rand() % height + 1;
-		rect[i].setSize( sf::Vector2f( 50.f, 50.f ) );
-		rect[i].setPosition( posw, posh );
-		rect[i].setFillColor( color[curr] );
-	}
+    // initialise drawing circles
+    for ( int i = 0; i < numCircle; i++ ) {
+        circ[i].setRadius( 30.f );
+        circ[i].setPosition( rand() % width + 1, rand() % height + 1 );
+        circ[i].setFillColor( color[colorcycle(i)] );
+    }
 
-	sf::Thread thread( &threader, &window );
-	thread.launch();
+    // initialise drawing squares
+    for ( int i = 0; i < numRect; i++ ) {
+        rect[i].setSize( sf::Vector2f( 50.f, 50.f ) );
+        rect[i].setPosition( rand() % width + 1, rand() % height + 1 );
+        rect[i].setFillColor( color[colorcycle(i)] );
+    }
 
-	while ( window.isOpen() ) {
-		sf::Event event;
-		while ( window.pollEvent( event ) ) {
-			switch( event.type ) {
-				case sf::Event::KeyPressed:
-					switch( event.key.code ) {
-						case keyUp:
-							keyUpPressed = true;
-							break;
-						case keyDown:
-							keyDownPressed = true;
-							break;
-						case keyLeft:
-							keyLeftPressed = true;
-							break;
-						case keyRight:
-							keyRightPressed = true;
-							break;
-						case keyQuit:
-							keyQuitPressed = true;
-							break;
-					}
-					break;
-				case sf::Event::KeyReleased:
-					switch( event.key.code ) {
-						case keyUp:
-							keyUpPressed = false;
-							break;
-						case keyDown:
-							keyDownPressed = false;
-							break;
-						case keyLeft:
-							keyLeftPressed = false;
-							break;
-						case keyRight:
-							keyRightPressed = false;
-							break;
-						case keyQuit:
-							keyQuitPressed = false;
-							break;
-					}
-					break;
-				case sf::Event::Closed:
-					window.close();
-					break;
-			}
-		}
-	}
+    while ( window.isOpen() ) {
+        // handle input
+        sf::Event event;
+        while ( window.pollEvent(event) ) {
+            if ( event.type == sf::Event::Closed )
+                window.close();
+            // keyboard
+            if ( event.type == sf::Event::KeyPressed ) {
+                if ( event.key.code == keyUp ) keyUpPressed = true;
+                if ( event.key.code == keyDown ) keyDownPressed = true;
+                if ( event.key.code == keyLeft ) keyLeftPressed = true;
+                if ( event.key.code == keyRight ) keyRightPressed = true;
+                if ( event.key.code == keyClose ) keyClosePressed = true;
+            }
+            if ( event.type == sf::Event::KeyReleased ) {
+                if ( event.key.code == keyUp ) keyUpPressed = false;
+                if ( event.key.code == keyDown ) keyDownPressed = false;
+                if ( event.key.code == keyLeft ) keyLeftPressed = false;
+                if ( event.key.code == keyRight ) keyRightPressed = false;
+                if ( event.key.code == keyClose ) keyClosePressed = false;
+            }
+            // mouse
+            if ( event.type == sf::Event::MouseButtonPressed ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = true;
+            if ( event.type == sf::Event::MouseButtonReleased ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = false;
+        }
 
-	// input/movement code
-	while (keyUpPressed) circ[0].move(0, -200);
+        if ( keyClosePressed ) {
+            keyClosePressed = false;
+            window.close();
+        }
 
-	return 0;
+        // update game objects
+        // other circles and other rectangles auto movement, note the int i = 1
+        for ( int i = 1; i < numCircle; i++ ) circ[i].move( 0 , autoMovement );
+        for ( int i = 1; i < numRect; i++ ) rect[i].move( autoMovement, 0 );
+        // circ[0] input
+        if ( keyUpPressed ) circ[0].move( 0, -circleInput );
+        if ( keyDownPressed ) circ[0].move( 0, circleInput );
+        if ( keyLeftPressed ) circ[0].move( -circleInput, 0 );
+        if ( keyRightPressed ) circ[0].move( circleInput, 0 );
+        // rect[0] input        
+        if ( buttonLeftPressed ) {
+            cout << "mouse coords: " << event.mouseButton.x << ", " << event.mouseButton.y << endl;
+        }
+        // draw game to screen
+        window.clear( sf::Color::Black );
+        for ( int n = 0; n < numCircle; n++ ) window.draw( circ[n] );
+        for ( int i = 0; i < numRect; i++ ) window.draw( rect[i] );
+        window.display();
+    }
+
+    return 0;
 }
