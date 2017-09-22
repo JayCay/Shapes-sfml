@@ -6,9 +6,7 @@ using namespace std;
 
 // DEFINES
 #define FPS 60
-#define numCircle 60
-#define numRect 40
-#define numColor 6
+#define numCircle 1
 // keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
@@ -16,30 +14,13 @@ using namespace std;
 #define keyRight sf::Keyboard::D
 #define keyClose sf::Keyboard::Escape
 
-int colorcycle( int count ) {
-    if ( count >= numColor ) {
-        int n = count % numColor;
-        return n;
-    }
-    else return count;
-}
-
 int main() {
     srand( time( NULL ) );
     int width = 800; int height = 720;
-    sf::RenderWindow window( sf::VideoMode( width, height ), "shapes v3" );
+    sf::RenderWindow window( sf::VideoMode( width, height ), "shape v0" );
     window.setFramerateLimit( FPS );
     window.setActive( false );
-    sf::CircleShape circ[numCircle];
-    sf::RectangleShape rect[numRect];
-    // colors
-    sf::Color color[numColor];
-    color[0] = sf::Color::Red;
-    color[1] = sf::Color::Green;
-    color[2] = sf::Color::Blue;
-    color[3] = sf::Color::Yellow;
-    color[4] = sf::Color::Cyan;
-    color[5] = sf::Color::White;
+    sf::CircleShape circ;
     // input booleans
     bool keyUpPressed = false;
     bool keyDownPressed = false;
@@ -50,22 +31,15 @@ int main() {
     // movement constants
     float circleInput = 200.0/FPS;
     float autoMovement = 20.0/FPS;
+    // vector constants
+    float velocity = 0.0f;
+    float acceleration = 0.0f;
+    float friction = 0.0f;
+    float elas = 0.0f;
 
-
-
-    // initialise drawing circles
-    for ( int i = 0; i < numCircle; i++ ) {
-        circ[i].setRadius( 30.f );
-        circ[i].setPosition( rand() % width + 1, rand() % height + 1 );
-        circ[i].setFillColor( color[colorcycle(i)] );
-    }
-
-    // initialise drawing squares
-    for ( int i = 0; i < numRect; i++ ) {
-        rect[i].setSize( sf::Vector2f( 50.f, 50.f ) );
-        rect[i].setPosition( rand() % width + 1, rand() % height + 1 );
-        rect[i].setFillColor( color[colorcycle(i)] );
-    }
+    // initialise drawing the circle
+    circ.setRadius( 30.f );
+    circ.setFillColor( sf::Color::Red );
 
     while ( window.isOpen() ) {
         // handle input
@@ -89,9 +63,6 @@ int main() {
                 if ( event.key.code == keyClose ) keyClosePressed = false;
             }
             // mouse
-            if ( event.type == sf::Event::MouseButtonPressed ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = true;
-            if ( event.type == sf::Event::MouseButtonReleased ) if ( event.mouseButton.button == sf::Mouse::Left ) buttonLeftPressed = false;
-
         }
 
         if ( keyClosePressed ) {
@@ -100,75 +71,19 @@ int main() {
         }
 
         // update game objects
-        // other circles and other rectangles auto movement, note the int i = 1
-        for ( int i = 1; i < numCircle; i++ ) circ[i].move( 0 , autoMovement );
-        for ( int i = 1; i < numRect; i++ ) rect[i].move( autoMovement, 0 );
-        // circ[0] input
-        if ( keyUpPressed ) circ[0].move( 0, -circleInput );
-        if ( keyDownPressed ) circ[0].move( 0, circleInput );
-        if ( keyLeftPressed ) circ[0].move( -circleInput, 0 );
-        if ( keyRightPressed ) circ[0].move( circleInput, 0 );
-        // rect[0] input        
-		if (buttonLeftPressed) 
-		{
-	    	//get position of mouse and rectangle
-	    	sf::Vector2i mPos = sf::Mouse::getPosition( window );
-	    	sf::Vector2f rPos = rect[0].getPosition();
+        // circ input
+        //f::Vector2f cVel = circ.getPosition();
+        sf::Vector2f cVel =  circ.getPosition();
+        if ( keyUpPressed ) cVel.y -= 10.0f;
+        if ( keyDownPressed ) cVel.y += 10.0f;
+        if ( keyLeftPressed ) cVel.x -= 10.0f;
+        if ( keyRightPressed ) cVel.x += 10.0f;
 
-	    	//makes the basis for checking distance the center of the rectangle
-	    	int rPosix = rPos.x + 25;
-	    	int rPosiy = rPos.y + 25; 
-
-	    	//no movement if both x and y values are 3 pixels apart
-	    	if((rPosix - mPos.x < 3 && rPosix - mPos.x > -3) && (rPosiy - mPos.y < 3 && rPosiy - mPos.y > -3)){
-	    		rect[0].move(0,0);
-	    	}
-	    	//movement if only the y value is 3 pixels apart
-	    	else if(rPosiy - mPos.y < 3 && rPosiy - mPos.y > -3){
-	    			if(rPosix > mPos.x){
-	    			rect[0].move(-circleInput, 0);
-	    			}
-	    			if(rPosix < mPos.x){
-	    			rect[0].move(circleInput,0);
-	    			}
-	    		}
-	    	//movement if only the x value is 3 pixels apart
-	    	else if(rPosix - mPos.x < 3 && rPosix - mPos.x > -3){
-	    				if(rPosiy > mPos.y){
-	    				rect[0].move(0,-circleInput);
-	    				}
-	    				if(rPosiy < mPos.y){
-	    				rect[0].move(0,circleInput);
-	    				}
-	    			}
-	    	//movement when both are more than 3 pixels apart
-	    	else{
-
-	    		if(rPosix > mPos.x){
-	    			rect[0].move(-circleInput, 0);
-	    		}
-	    		if(rPosix < mPos.x){
-	    			rect[0].move(circleInput,0);
-	    		}
-	    	 	if(rPosiy > mPos.y){
-	    			rect[0].move(0,-circleInput);
-	    		}
-	    		if(rPosiy < mPos.y){
-	    			rect[0].move(0,circleInput);
-	    		}
-	    	}	
-	    		  
-
-	   			 
-		}
-
-      
-       
+        circ.setPosition(cVel.x, cVel.y);
 
         // draw game to screen
         window.clear( sf::Color::Black );
-        for ( int n = 0; n < numCircle; n++ ) window.draw( circ[n] );
-        for ( int i = 0; i < numRect; i++ ) window.draw( rect[i] );
+        window.draw( circ );
         window.display();
     }
 
