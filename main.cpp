@@ -1,5 +1,6 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
+#include <cmath>
 
 
 using namespace std;
@@ -14,8 +15,13 @@ using namespace std;
 #define keyRight sf::Keyboard::D
 #define keyClose sf::Keyboard::Escape
 
+void move(){
+    
+}
+
 int main() {
     srand( time( NULL ) );
+    sf::Clock Clock;
     int width = 800; int height = 720;
     sf::RenderWindow window( sf::VideoMode( width, height ), "shape v0" );
     window.setFramerateLimit( FPS );
@@ -33,7 +39,7 @@ int main() {
     float autoMovement = 20.0/FPS;
     // vector constants
     float velocity = 0.0f;
-    float acceleration = 0.0f;
+    float acceleration = 2.0f;
     float friction = 0.0f;
     float elas = 0.0f;
 
@@ -70,16 +76,42 @@ int main() {
             window.close();
         }
 
+        sf::Time ElapsedTime = Clock.getElapsedTime();
+
         // update game objects
         // circ input
         //f::Vector2f cVel = circ.getPosition();
-        sf::Vector2f cVel =  circ.getPosition();
-        if ( keyUpPressed ) cVel.y -= 10.0f;
-        if ( keyDownPressed ) cVel.y += 10.0f;
-        if ( keyLeftPressed ) cVel.x -= 10.0f;
-        if ( keyRightPressed ) cVel.x += 10.0f;
+        //sf::Vector2f cVel =  circ.getPosition();
 
-        circ.setPosition(cVel.x, cVel.y);
+        sf::Vector2f cPos = circ.getPosition();
+
+        sf::Vector2f cVec(0.0f,0.0f);
+        if ( keyUpPressed ) cVec.y -= circleInput;
+        if ( keyDownPressed ) cVec.y += circleInput;
+        if ( keyLeftPressed ) cVec.x -= circleInput;
+        if ( keyRightPressed ) cVec.x += circleInput;
+
+
+
+        sf::Vector2f normVec(cVec.x/sqrt(cVec.x * cVec.x + cVec.y * cVec.y),cVec.y/sqrt(cVec.x * cVec.x + cVec.y * cVec.y));
+        
+        normVec = normVec * acceleration;
+
+        cVec.y += normVec.y;
+        cVec.x += normVec.x;
+
+        sf::Vector2f dVec(cVec.x,cVec.y);
+
+        cPos.x += dVec.x;
+        cPos.y += dVec.y;
+
+        circ.setPosition(dVec.x,dVec.y);
+
+
+
+        
+
+
 
         // draw game to screen
         window.clear( sf::Color::Black );
