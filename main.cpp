@@ -22,7 +22,7 @@ void move(){
 int main() {
     srand( time( NULL ) );
     sf::Clock Clock;
-    int width = 800; int height = 720;
+        int width = 800; int height = 720;
     sf::RenderWindow window( sf::VideoMode( width, height ), "shape v0" );
     window.setFramerateLimit( FPS );
     window.setActive( false );
@@ -35,11 +35,11 @@ int main() {
     bool keyClosePressed = false;
     bool buttonLeftPressed = false;
     // movement constants
-    float circleInput = 200.0/FPS;
+    float circleInput = 20.0/FPS;
     float autoMovement = 20.0/FPS;
     // vector constants
     float velocity = 0.0f;
-    float acceleration = 2.0f;
+    float acceleration = 20.0f;
     float friction = 0.0f;
     float elas = 0.0f;
 
@@ -48,6 +48,9 @@ int main() {
     circ.setFillColor( sf::Color::Red );
 
     while ( window.isOpen() ) {
+        
+        sf::Time elapsedTime = Clock.getElapsedTime();
+
         // handle input
         sf::Event event;
         while ( window.pollEvent(event) ) {
@@ -76,37 +79,43 @@ int main() {
             window.close();
         }
 
-        sf::Time ElapsedTime = Clock.getElapsedTime();
-
+        
+       
         // update game objects
         // circ input
         //f::Vector2f cVel = circ.getPosition();
         //sf::Vector2f cVel =  circ.getPosition();
 
+
         sf::Vector2f cPos = circ.getPosition();
 
         sf::Vector2f cVec(0.0f,0.0f);
         if ( keyUpPressed ) cVec.y -= circleInput;
+             
         if ( keyDownPressed ) cVec.y += circleInput;
+                      
         if ( keyLeftPressed ) cVec.x -= circleInput;
+               
         if ( keyRightPressed ) cVec.x += circleInput;
-
-
-
-        sf::Vector2f normVec(cVec.x/sqrt(cVec.x * cVec.x + cVec.y * cVec.y),cVec.y/sqrt(cVec.x * cVec.x + cVec.y * cVec.y));
         
-        normVec = normVec * acceleration;
 
-        cVec.y += normVec.y;
-        cVec.x += normVec.x;
 
-        sf::Vector2f dVec(cVec.x,cVec.y);
 
-        cPos.x += dVec.x;
-        cPos.y += dVec.y;
+        //sf::Vector2f normVec(cVec.x/sqrt((cVec.x * cVec.x) + (cVec.y * cVec.y)),cVec.y/sqrt((cVec.x * cVec.x) + (cVec.y * cVec.y)));
+        
+        sf::Vector2f fVel(cVec * acceleration * elapsedTime.asSeconds() );
 
-        circ.setPosition(dVec.x,dVec.y);
+        
 
+
+            
+        if (keyUpPressed == false  &&  keyDownPressed == false && keyLeftPressed== false
+            && keyRightPressed== false) Clock.restart();
+             
+
+
+
+        circ.move(fVel);
 
 
         
