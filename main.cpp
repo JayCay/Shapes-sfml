@@ -34,11 +34,10 @@ int main() {
     // movement constants
     float circleInput = 20.0 / FPS;
     float autoMovement = 20.0 / FPS;
-    // vector constants
-    float velocity = 0.0f;
+    // vector math
     float force = 10.0f;
     float mass = 1.0f;
-    float friction = 0.02f;
+    float friction = 0.2f;
     sf::Vector2f cPos( 0.0f, 0.0f );
     sf::Vector2f cVel( 0.0f, 0.f );
     // initialise drawing the circle
@@ -48,6 +47,7 @@ int main() {
     circ.setPosition( width / 2.f, height / 2.f );
 
     while ( window.isOpen() ) {
+        //get delta time
         sf::Time dt = Clock.restart();
 
         // handle input
@@ -79,6 +79,7 @@ int main() {
             window.close();
         }
 
+        //friction mode toggle
         if ( keyFrictionPressed ) {
             keyFrictionPressed = false;
             frictionMode = !frictionMode;
@@ -91,11 +92,9 @@ int main() {
         if ( keyRightPressed ) cVel.x += ( force / mass ) * dt.asSeconds();
         circ.setFillColor( sf::Color::Red );
 
+        //friction  mode
         if ( frictionMode ) {
-            if ( cVel.y > 0 ) cVel.y -= ( ( friction * cVel.y ) );
-            if ( cVel.y < 0 ) cVel.y -= ( ( friction * cVel.y ) );
-            if ( cVel.x > 0 ) cVel.x -= ( ( friction * cVel.x ) );
-            if ( cVel.x < 0 ) cVel.x -= ( ( friction * cVel.x ) );
+            cVel -= ((friction *cVel)/mass);
             circ.setFillColor( sf::Color::Blue );
         }
 
@@ -106,9 +105,6 @@ int main() {
         if ( cPos.y + 30.f > height || cPos.x == height ) cVel.y = -1.f * cVel.y;
         if ( cPos.x - 30.f < 0.f || cPos.x == 0.f ) cVel.x = -1.f * cVel.x;
         if ( cPos.x + 30.f > width  || cPos.x == width ) cVel.x = -1.f * cVel.x;
-
-        //show ball's current velocity (will remove soon)
-        cout << cVel.x << " " << cVel.y << endl;
 
         //ball movement
         circ.move( cVel.x, cVel.y );
