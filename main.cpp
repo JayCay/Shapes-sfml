@@ -14,6 +14,7 @@ using namespace std;
 #define keyLeft sf::Keyboard::A
 #define keyRight sf::Keyboard::D
 #define keyClose sf::Keyboard::Escape
+#define keyFriction sf::Keyboard::F
 
 void move(){
     
@@ -34,6 +35,8 @@ int main() {
     bool keyRightPressed = false;
     bool keyClosePressed = false;
     bool buttonLeftPressed = false;
+	bool keyFrictionPressed = false;
+	bool frictionMode = false;
     // movement constants
     float circleInput = 20.0/FPS;
     float autoMovement = 20.0/FPS;
@@ -41,6 +44,7 @@ int main() {
     float velocity = 0.0f;
     float force = 10.0f;
     float mass = 1.0f;
+	float friction = 0.2f;
 
     sf::Vector2f cPos(0.0f,0.0f);
     sf::Vector2f cVel(0.0f,0.f);
@@ -67,6 +71,7 @@ int main() {
                 if ( event.key.code == keyLeft ) keyLeftPressed = true;
                 if ( event.key.code == keyRight ) keyRightPressed = true;
                 if ( event.key.code == keyClose ) keyClosePressed = true;
+				if ( event.key.code == keyFriction ) keyFrictionPressed = true;
             }
             if ( event.type == sf::Event::KeyReleased ) {
                 if ( event.key.code == keyUp ) keyUpPressed = false;
@@ -74,26 +79,44 @@ int main() {
                 if ( event.key.code == keyLeft ) keyLeftPressed = false;
                 if ( event.key.code == keyRight ) keyRightPressed = false;
                 if ( event.key.code == keyClose ) keyClosePressed = false;
+				if ( event.key.code == keyFriction ) keyFrictionPressed = false;
             }
-            // mouse
         }
 
         if ( keyClosePressed ) {
             keyClosePressed = false;
             window.close();
         }
+		
+		if ( keyFrictionPressed ) {
+			keyFrictionPressed = false;
+			frictionMode = !frictionMode;
+		}
 
             
 
         //change ball's current velocity
-        if ( keyUpPressed ) cVel.y -= (force/mass) * dt.asSeconds();
-             
-        if ( keyDownPressed ) cVel.y += (force/mass) * dt.asSeconds();
-                      
-        if ( keyLeftPressed ) cVel.x -= (force/mass) * dt.asSeconds();
-               
-        if ( keyRightPressed ) cVel.x += (force/mass) * dt.asSeconds();
+		
+		if ( frictionMode == false )
+		{
+			if ( keyUpPressed ) cVel.y -= (force/mass) * dt.asSeconds();
+				 
+			if ( keyDownPressed ) cVel.y += (force/mass) * dt.asSeconds();
+						  
+			if ( keyLeftPressed ) cVel.x -= (force/mass) * dt.asSeconds();
+				   
+			if ( keyRightPressed ) cVel.x += (force/mass) * dt.asSeconds();
+			
+			circ.setFillColor( sf::Color::Red );
+		}
   
+		else if ( frictionMode )
+		{	
+			cVel.x = cVel.x - ( (friction * cVel.x)/ mass );
+			cVel.y = cVel.y - ( (friction * cVel.y)/ mass );
+			circ.setFillColor( sf::Color::Blue );
+		}
+		
              
          cPos = circ.getPosition();
 
