@@ -22,7 +22,7 @@ void move(){
 int main() {
     srand( time( NULL ) );
     sf::Clock Clock;
-        int width = 800; int height = 720;
+    int width = 800; int height = 720;
     sf::RenderWindow window( sf::VideoMode( width, height ), "shape v0" );
     window.setFramerateLimit( FPS );
     window.setActive( false );
@@ -39,17 +39,21 @@ int main() {
     float autoMovement = 20.0/FPS;
     // vector constants
     float velocity = 0.0f;
-    float acceleration = 20.0f;
-    float friction = 0.0f;
-    float elas = 0.0f;
+    float force = 10.0f;
+    float mass = 1.0f;
+
+    sf::Vector2f cPos(0.0f,0.0f);
+    sf::Vector2f cVel(0.0f,0.f);
 
     // initialise drawing the circle
     circ.setRadius( 30.f );
+    circ.setOrigin(30.f,30.f);
     circ.setFillColor( sf::Color::Red );
+    circ.setPosition(width/2.f, height/2.f);
 
     while ( window.isOpen() ) {
         
-        sf::Time elapsedTime = Clock.getElapsedTime();
+        sf::Time dt = Clock.restart();
 
         // handle input
         sf::Event event;
@@ -79,48 +83,40 @@ int main() {
             window.close();
         }
 
-        
-       
-        // update game objects
-        // circ input
-        //f::Vector2f cVel = circ.getPosition();
-        //sf::Vector2f cVel =  circ.getPosition();
-
-
-        sf::Vector2f cPos = circ.getPosition();
-
-        sf::Vector2f cVec(0.0f,0.0f);
-        if ( keyUpPressed ) cVec.y -= circleInput;
-             
-        if ( keyDownPressed ) cVec.y += circleInput;
-                      
-        if ( keyLeftPressed ) cVec.x -= circleInput;
-               
-        if ( keyRightPressed ) cVec.x += circleInput;
-        
-
-
-
-        //sf::Vector2f normVec(cVec.x/sqrt((cVec.x * cVec.x) + (cVec.y * cVec.y)),cVec.y/sqrt((cVec.x * cVec.x) + (cVec.y * cVec.y)));
-        
-        sf::Vector2f fVel(cVec * acceleration * elapsedTime.asSeconds() );
-
-        
-
-
             
-        if (keyUpPressed == false  &&  keyDownPressed == false && keyLeftPressed== false
-            && keyRightPressed== false) Clock.restart();
+
+        //change ball's current velocity
+        if ( keyUpPressed ) cVel.y -= (force/mass) * dt.asSeconds();
              
+        if ( keyDownPressed ) cVel.y += (force/mass) * dt.asSeconds();
+                      
+        if ( keyLeftPressed ) cVel.x -= (force/mass) * dt.asSeconds();
+               
+        if ( keyRightPressed ) cVel.x += (force/mass) * dt.asSeconds();
+  
+             
+         cPos = circ.getPosition();
 
 
-
-        circ.move(fVel);
-
-
+        //elasticity
+        if (cPos.y - 30.f < 0.f || cPos.y == 0.f){
+            cVel.y = -1.f * cVel.y; 
+        }
+        if (cPos.y + 30.f > height || cPos.x == height ){
+            cVel.y = -1.f* cVel.y;
+        }
+        if (cPos.x - 30.f < 0.f || cPos.x == 0.f){
+            cVel.x = -1.f * cVel.x;
+        }
+        if (cPos.x + 30.f > width  || cPos.x == width ){
+            cVel.x = -1.f* cVel.x;
+        }
         
+        //show ball's current velocity (will remove soon)
+        cout << cVel.x << " " << cVel.y << endl;
 
-
+        //ball movement
+        circ.move(cVel.x, cVel.y);
 
         // draw game to screen
         window.clear( sf::Color::Black );
