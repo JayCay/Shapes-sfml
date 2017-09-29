@@ -5,7 +5,15 @@
 using namespace std;
 
 // DEFINES
+#define RADIUS 30.0f
+#define WIDTH 800
+#define HEIGHT 600
 #define FPS 60
+#define TIMESTEP 1.f/FPS
+#define FORCE 160.0f
+#define MASS 1.0f
+#define FRICTION 0.2f * TIMESTEP
+#define ELASTICITY 1.0f
 // keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
@@ -15,10 +23,7 @@ using namespace std;
 #define keyFriction sf::Keyboard::F
 
 int main() {
-    srand( time( NULL ) );
-    sf::Clock Clock;
-    int width = 800; int height = 720;
-    sf::RenderWindow window( sf::VideoMode( width, height ), "shape v6.9" );
+    sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape v6.10" );
     window.setFramerateLimit( FPS );
     window.setActive( false );
     sf::CircleShape circ;
@@ -35,26 +40,23 @@ int main() {
     float circleInput = 20.0 / FPS;
     float autoMovement = 20.0 / FPS;
     // vector math
-    float force = 10.0f;
-    float mass = 1.0f;
-    float friction = 0.2f;
+    float getTime = TIMESTEP;
+    float force = FORCE;
+    float mass = MASS;
+    float friction = FRICTION;
     sf::Vector2f cPos( 0.0f, 0.0f );
     sf::Vector2f cVel( 0.0f, 0.f );
     // initialise drawing the circle
-    circ.setRadius( 30.f );
-    circ.setOrigin( 30.f, 30.f );
+    circ.setRadius( RADIUS );
+    circ.setOrigin( RADIUS, RADIUS );
     circ.setFillColor( sf::Color::Red );
-    circ.setPosition( width / 2.f, height / 2.f );
+    circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
 
     while ( window.isOpen() ) {
-        //get delta time
-        sf::Time dt = Clock.restart();
-
         // handle input
         sf::Event event;
         while ( window.pollEvent(event) ) {
-            if ( event.type == sf::Event::Closed )
-                window.close();
+            if ( event.type == sf::Event::Closed ) window.close();
             // keyboard
             if ( event.type == sf::Event::KeyPressed ) {
                 if ( event.key.code == keyUp ) keyUpPressed = true;
@@ -86,10 +88,10 @@ int main() {
         }
 
         //change ball's current velocity
-        if ( keyUpPressed ) cVel.y -= ( force / mass ) * dt.asSeconds();
-        if ( keyDownPressed ) cVel.y += ( force / mass ) * dt.asSeconds();
-        if ( keyLeftPressed ) cVel.x -= ( force / mass ) * dt.asSeconds();
-        if ( keyRightPressed ) cVel.x += ( force / mass ) * dt.asSeconds();
+        if ( keyUpPressed ) cVel.y -= ( force / mass ) * getTime;
+        if ( keyDownPressed ) cVel.y += ( force / mass ) * getTime;
+        if ( keyLeftPressed ) cVel.x -= ( force / mass ) * getTime;
+        if ( keyRightPressed ) cVel.x += ( force / mass ) * getTime;
         circ.setFillColor( sf::Color::Red );
 
         //friction  mode
@@ -101,10 +103,10 @@ int main() {
         cPos = circ.getPosition();
 
         //elasticity
-        if ( cPos.y - 30.f < 0.f || cPos.y == 0.f ) cVel.y = -1.f * cVel.y;
-        if ( cPos.y + 30.f > height || cPos.x == height ) cVel.y = -1.f * cVel.y;
-        if ( cPos.x - 30.f < 0.f || cPos.x == 0.f ) cVel.x = -1.f * cVel.x;
-        if ( cPos.x + 30.f > width  || cPos.x == width ) cVel.x = -1.f * cVel.x;
+        if ( cPos.y - 30.f < 0.f || cPos.y == 0.f ) cVel.y = -ELASTICITY * cVel.y;
+        if ( cPos.y + 30.f > HEIGHT || cPos.x == HEIGHT ) cVel.y = -ELASTICITY * cVel.y;
+        if ( cPos.x - 30.f < 0.f || cPos.x == 0.f ) cVel.x = -ELASTICITY * cVel.x;
+        if ( cPos.x + 30.f > WIDTH  || cPos.x == WIDTH ) cVel.x = -ELASTICITY * cVel.x;
 
         //ball movement
         circ.move( cVel.x, cVel.y );
