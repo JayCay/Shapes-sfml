@@ -10,10 +10,11 @@ using namespace std;
 #define HEIGHT 600
 #define FPS 60
 #define TIMESTEP 1.f/FPS
-#define FORCE 160.0f
+#define FORCE 160.0f * TIMESTEP
 #define MASS 1.0f
 #define FRICTION 0.2f * TIMESTEP
 #define ELASTICITY 1.0f
+#define ACCELERATION FORCE/MASS
 // keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
@@ -40,10 +41,11 @@ int main() {
     float circleInput = 20.0 / FPS;
     float autoMovement = 20.0 / FPS;
     // vector math
-    float getTime = TIMESTEP;
+    //float getTime = TIMESTEP;
     float force = FORCE;
     float mass = MASS;
     float friction = FRICTION;
+    float acceleration = ACCELERATION;
     sf::Vector2f cPos( 0.0f, 0.0f );
     sf::Vector2f cVel( 0.0f, 0.f );
     // initialise drawing the circle
@@ -88,10 +90,10 @@ int main() {
         }
 
         //change ball's current velocity
-        if ( keyUpPressed ) cVel.y -= ( force / mass ) * getTime;
-        if ( keyDownPressed ) cVel.y += ( force / mass ) * getTime;
-        if ( keyLeftPressed ) cVel.x -= ( force / mass ) * getTime;
-        if ( keyRightPressed ) cVel.x += ( force / mass ) * getTime;
+        if ( keyUpPressed ) cVel.y -= acceleration;
+        if ( keyDownPressed ) cVel.y +=  acceleration;
+        if ( keyLeftPressed ) cVel.x -= acceleration;
+        if ( keyRightPressed ) cVel.x += acceleration;
         circ.setFillColor( sf::Color::Red );
 
         //friction  mode
@@ -103,13 +105,13 @@ int main() {
         cPos = circ.getPosition();
 
         //elasticity
-        if ( cPos.y - 30.f < 0.f || cPos.y == 0.f ) cVel.y = -ELASTICITY * cVel.y;
-        if ( cPos.y + 30.f > HEIGHT || cPos.x == HEIGHT ) cVel.y = -ELASTICITY * cVel.y;
-        if ( cPos.x - 30.f < 0.f || cPos.x == 0.f ) cVel.x = -ELASTICITY * cVel.x;
-        if ( cPos.x + 30.f > WIDTH  || cPos.x == WIDTH ) cVel.x = -ELASTICITY * cVel.x;
+        if ( cPos.y - RADIUS < 0.f || cPos.y == 0.f || cPos.y + RADIUS > HEIGHT || cPos.x == HEIGHT ) cVel.y = -ELASTICITY * cVel.y;
+        if ( cPos.x - RADIUS < 0.f || cPos.x == 0.f || cPos.x + RADIUS > WIDTH  || cPos.x == WIDTH ) cVel.x = -ELASTICITY * cVel.x;
+
+        cPos += cVel;
 
         //ball movement
-        circ.move( cVel.x, cVel.y );
+        circ.setPosition( cPos.x, cPos.y );
 
         // draw game to screen
         window.clear( sf::Color::Black );
