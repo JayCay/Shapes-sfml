@@ -105,8 +105,23 @@ int main() {
         cPos = circ.getPosition();
 
         //elasticity
-        if ( cPos.y - RADIUS < 0.f || cPos.y == 0.f || cPos.y + RADIUS > HEIGHT || cPos.x == HEIGHT ) cVel.y = -ELASTICITY * cVel.y;
-        if ( cPos.x - RADIUS < 0.f || cPos.x == 0.f || cPos.x + RADIUS > WIDTH  || cPos.x == WIDTH ) cVel.x = -ELASTICITY * cVel.x;
+        if ( cPos.y - RADIUS < 0.f ){   
+            cPos.y = 0 + RADIUS;
+            cVel.y = -ELASTICITY * cVel.y;
+            }
+        if (cPos.y + RADIUS > HEIGHT){
+            cPos.y = HEIGHT - RADIUS;
+            cVel.y = -ELASTICITY * cVel.y;
+        }
+        if ( cPos.x - RADIUS < 0.f){
+            cPos.x = 0 + RADIUS;
+            cVel.x = -ELASTICITY * cVel.x;
+        }
+
+        if(cPos.x + RADIUS > WIDTH ){
+            cPos.x = WIDTH - RADIUS;
+            cVel.x = -ELASTICITY * cVel.x;
+        }
 
         cPos += cVel;
 
