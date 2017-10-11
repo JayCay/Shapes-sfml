@@ -8,13 +8,13 @@ using namespace std;
 #define RADIUS 30.0f
 #define WIDTH 800
 #define HEIGHT 600
-#define FPS 60
+#define FPS 60.f
 #define TIMESTEP 1.f/FPS
-#define FORCE 160.0f * TIMESTEP
+#define FORCE 160.0f 
 #define MASS 1.0f
 #define FRICTION 0.2f * TIMESTEP
 #define ELASTICITY 1.0f
-#define ACCELERATION FORCE/MASS
+
 // keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
@@ -43,11 +43,12 @@ int main() {
     // vector math
     //float getTime = TIMESTEP;
     float force = FORCE;
-    float mass = MASS;
+    float mass = 1.f/MASS;
     float friction = FRICTION;
-    float acceleration = ACCELERATION;
+    //sf::Vector2f cAcel(0.0f, 0.0f );
     sf::Vector2f cPos( 0.0f, 0.0f );
     sf::Vector2f cVel( 0.0f, 0.f );
+    sf::Vector2f cAcel(0.0f, 0.0f );
     // initialise drawing the circle
     circ.setRadius( RADIUS );
     circ.setOrigin( RADIUS, RADIUS );
@@ -61,21 +62,26 @@ int main() {
             if ( event.type == sf::Event::Closed ) window.close();
             // keyboard
             if ( event.type == sf::Event::KeyPressed ) {
-                if ( event.key.code == keyUp ) keyUpPressed = true;
-                if ( event.key.code == keyDown ) keyDownPressed = true;
-                if ( event.key.code == keyLeft ) keyLeftPressed = true;
-                if ( event.key.code == keyRight ) keyRightPressed = true;
                 if ( event.key.code == keyClose ) keyClosePressed = true;
                 if ( event.key.code == keyFriction ) keyFrictionPressed = true;
             }
             if ( event.type == sf::Event::KeyReleased ) {
-                if ( event.key.code == keyUp ) keyUpPressed = false;
-                if ( event.key.code == keyDown ) keyDownPressed = false;
-                if ( event.key.code == keyLeft ) keyLeftPressed = false;
-                if ( event.key.code == keyRight ) keyRightPressed = false;
                 if ( event.key.code == keyClose ) keyClosePressed = false;
                 if ( event.key.code == keyFriction ) keyFrictionPressed = false;
             }
+            if ( event.type == sf::Event::KeyPressed ) {
+                if ( event.key.code == keyUp ) cAcel.y = -(force * mass);
+                if ( event.key.code == keyDown ) cAcel.y =  force * mass;
+                if ( event.key.code == keyLeft) cAcel.x = -(force * mass);
+                if ( event.key.code == keyRight) cAcel.x = force * mass;
+            }
+            if ( event.type == sf::Event::KeyReleased ) {
+                if ( event.key.code == keyUp ) cAcel.y = 0;
+                if ( event.key.code == keyDown ) cAcel.y = 0;
+                if ( event.key.code == keyLeft ) cAcel.x = 0;
+                if ( event.key.code == keyRight ) cAcel.x = 0;
+            } 
+
         }
 
         if ( keyClosePressed ) {
@@ -90,19 +96,31 @@ int main() {
         }
 
         //change ball's current velocity
-        if ( keyUpPressed ) cVel.y -= acceleration;
-        if ( keyDownPressed ) cVel.y +=  acceleration;
-        if ( keyLeftPressed ) cVel.x -= acceleration;
-        if ( keyRightPressed ) cVel.x += acceleration;
+        
+           /*if( event.type == sf::Event::KeyReleased ) 
+                switch(event.key.code){
+                    case keyUp:
+                    cAcel.y = 0;
+                    break;
+                    case keyLeft:
+                    cAcel.x = 0;
+                    break;
+                    case keyDown:
+                    cAcel.y = 0;
+                    break;
+                    case keyRight:
+                    cAcel.x = 0;
+                    break;
+                }
+                */
         circ.setFillColor( sf::Color::Red );
 
-        //friction  mode
-        if ( frictionMode ) {
-            cVel -= ((friction *cVel)/mass);
-            circ.setFillColor( sf::Color::Blue );
-        }
+        
 
         cPos = circ.getPosition();
+        cVel += (cAcel * TIMESTEP);
+
+        
 
         //elasticity
         if ( cPos.y - RADIUS < 0.f ){   
@@ -123,10 +141,19 @@ int main() {
             cVel.x = -ELASTICITY * cVel.x;
         }
 
-        cPos += cVel;
+        cPos += (0.5f * cAcel * TIMESTEP * TIMESTEP) + (cVel * TIMESTEP);
+
+        //friction  mode
+        if ( frictionMode ) {
+            cVel -= ((friction *cVel)/mass);
+            circ.setFillColor( sf::Color::Blue );
+        }
 
         //ball movement
         circ.setPosition( cPos.x, cPos.y );
+
+        
+        cout << cAcel.x << " " << cAcel.y << " " << cVel.x << " " << cVel.y << endl;
 
         // draw game to screen
         window.clear( sf::Color::Black );
