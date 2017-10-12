@@ -43,7 +43,7 @@ void makeCircles(int x, sf::CircleShape circ[]) {
 				}	
 				else if ( (spacex + DIAMETER) >= ( WIDTH - DIAMETER ) ) {
 					circ[i].setPosition( spacex, spacey );	
-					spacey = spacey + DIAMETER + 15;
+					spacey = spacey + DIAMETER + 65;
 					spacex = RADIUS;
 				}
 			}	

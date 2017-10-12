@@ -6,6 +6,7 @@ using namespace std;
 
 // DEFINES
 #define RADIUS 30.0f
+#define ORADIUS 25.f
 #define WIDTH 800
 #define HEIGHT 600
 #define FPS 60.f
@@ -40,17 +41,32 @@ sf::Vector2f cPos( 0.0f, 0.0f );
 sf::Vector2f cVel( 0.0f, 0.f );
 sf::Vector2f cAcel( 0.0f, 0.0f );
 sf::CircleShape circ;
-sf::CircleShape ocirc[50];
 sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape me" );
 
-void otherballs(int size){
-    for( int i = 0; i < size; i++ ){
-        ocirc[i].setRadius(25.f);
-        ocirc[i].setOrigin( 25.f, 25.f);
-        ocirc[i].setPosition( i * 80 + RADIUS, 50.f );
-        ocirc[i].setFillColor( sf::Color::White );
+void makeCircles(int x, sf::CircleShape circ[]) {
+        int spacex = ORADIUS; 
+        int spacey = ORADIUS;
+        for ( int i = 0; i < x; i++ ) {
+            circ[i].setRadius( ORADIUS );
+            circ[i].setFillColor( sf::Color::Green );
+            if( i == 0 ){
+                spacex =  spacex + (ORADIUS * 2) + 35;
+                circ[i].setPosition( spacex, spacey );
+                spacex =  spacex + (ORADIUS * 2) + 35;
+            }
+            else {
+                if ( (spacex + (ORADIUS * 2)) < ( WIDTH - (ORADIUS * 2) ) ) {
+                    circ[i].setPosition( spacex, spacey );  
+                    spacex = spacex + (ORADIUS * 2) + 35; 
+                }   
+                else if ( (spacex + (ORADIUS * 2)) >= ( WIDTH - (ORADIUS * 2) ) ) {
+                    circ[i].setPosition( spacex, spacey );  
+                    spacey = spacey + (ORADIUS * 2) + 75;
+                    spacex = ORADIUS;
+                }
+            }   
+        }
     }
-}    
 
 void moveball(){
     cPos = circ.getPosition();
@@ -115,9 +131,11 @@ int main( int argc, char *argv[] ) {
     circ.setRadius( RADIUS );
     circ.setOrigin( RADIUS, RADIUS );
     circ.setFillColor( sf::Color::Red );
-    circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
+    circ.setPosition( 50, 50 );
     
-    otherballs( size );
+     sf::CircleShape ocirc[size];
+    
+    makeCircles( size, ocirc );
 
     while ( window.isOpen() ) {
         // handle input
@@ -154,8 +172,15 @@ int main( int argc, char *argv[] ) {
             frictionMode = !frictionMode;
         }
 
-        circ.setFillColor( sf::Color::Red ); // default color
-        if ( frictionMode ) circ.setFillColor( sf::Color::Blue ); // friction mode color
+        // default colors
+        circ.setFillColor( sf::Color::Red ); 
+        for ( int i = 0; i < size; i++ ) {
+            ocirc[i].setFillColor( sf::Color::Green );
+            }
+        // friction mode color
+        if ( frictionMode ) {circ.setFillColor( sf::Color::Blue );
+            for( int i = 0; i < size; i++) ocirc[i].setFillColor( sf::Color::White );
+        } 
         boing(); // ball elasticity function
         moveball(); // ball movement function
         cout << cAcel.x << " " << cAcel.y << " " << cVel.x << " " << cVel.y << endl; // DEBUG print data to console
