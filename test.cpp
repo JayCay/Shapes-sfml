@@ -5,6 +5,7 @@ using namespace std;
 
 // DEFINES
 #define RADIUS 30.0f
+#define DIAMETER RADIUS * 2
 #define WIDTH 800
 #define HEIGHT 600
 #define FPS 60
@@ -23,13 +24,31 @@ using namespace std;
 #define keyClose sf::Keyboard::Escape
 #define keyFriction sf::Keyboard::F
 
+
 void makeCircles(int x, sf::CircleShape circ[]) {
-    for ( int i = 0; i < x + 1; i++ ) {
-        circ[i].setRadius( RADIUS );
-        // circ[i].setPosition(  );
-        circ[i].setFillColor( sf::Color::Green );
-    }
-}
+		int spacex = RADIUS; 
+		int spacey = RADIUS;
+		for ( int i = 0; i < x; i++ ) {
+			circ[i].setRadius( RADIUS );
+			circ[i].setFillColor( sf::Color::Green );
+			if( i == 0 ){
+				spacex =  spacex + DIAMETER + 15;
+				circ[i].setPosition( spacex, spacey );
+				spacex =  spacex + DIAMETER + 15;
+			}
+			else {
+				if ( (spacex + DIAMETER) < ( WIDTH - DIAMETER ) ) {
+					circ[i].setPosition( spacex, spacey );	
+					spacex = spacex + DIAMETER + 15; 
+				}	
+				else if ( (spacex + DIAMETER) >= ( WIDTH - DIAMETER ) ) {
+					circ[i].setPosition( spacex, spacey );	
+					spacey = spacey + DIAMETER + 15;
+					spacex = RADIUS;
+				}
+			}	
+		}
+	}
 
 int main( int argc, char *argv[] ) {
 	// init
@@ -50,6 +69,11 @@ int main( int argc, char *argv[] ) {
     sf::Color color[2];
     color[0] = sf::Color::Red;
     color[1] = sf::Color::Green;
+	// initialize player-circle 
+	sf::CircleShape pcirc;
+	pcirc.setRadius( 30.f );
+    pcirc.setPosition( RADIUS, RADIUS );
+    pcirc.setFillColor( sf::Color::Red );
 
 	if ( argc != 2 ) {
 		// if not enough or too many arguments
@@ -69,8 +93,8 @@ int main( int argc, char *argv[] ) {
 			cout << "The integer MUST be between 1 and 35, inclusive" << endl;
 		}
 	}
-	sf::CircleShape circ[x + 1];
-
+	sf::CircleShape circ[x];
+	
 	makeCircles( x, circ );
 
 	while ( window.isOpen() ) {
@@ -102,6 +126,7 @@ int main( int argc, char *argv[] ) {
         }
 
         window.clear( sf::Color::Black );
+		window.draw( pcirc );
         for ( int n = 0; n < x; n++ ) window.draw( circ[n] );
         window.display();
     }
