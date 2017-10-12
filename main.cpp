@@ -42,7 +42,19 @@ using namespace std;
     sf::Vector2f cVel( 0.0f, 0.f );
     sf::Vector2f cAcel(0.0f, 0.0f );
     sf::CircleShape circ;
+    sf::CircleShape ocirc[50];
     sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape v6.10" );
+
+void otherballs(int size){
+    for(int i = 0; i < size;i++){
+        ocirc[i].setRadius(25.f);
+        ocirc[i].setOrigin( 25.f, 25.f);
+        ocirc[i].setPosition(i*80 + RADIUS, 50.f );
+        ocirc[i].setFillColor(sf::Color::White);
+
+    }
+
+}    
 
 void moveball(){
     cPos = circ.getPosition();
@@ -89,6 +101,14 @@ int main() {
     circ.setOrigin( RADIUS, RADIUS );
     circ.setFillColor( sf::Color::Red );
     circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
+
+    int size = 0;
+    cout << "Size: ?" << endl;
+    cin >> size;
+
+
+
+    otherballs( size);
 
     while ( window.isOpen() ) {
         // handle input
@@ -147,6 +167,7 @@ int main() {
         // draw game to screen
         window.clear( sf::Color::Black );
         window.draw( circ );
+        for( int i =0; i < size; i++) window.draw( ocirc[i]);
         window.display();
     }
 
