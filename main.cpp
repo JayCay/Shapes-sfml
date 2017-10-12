@@ -23,27 +23,25 @@ using namespace std;
 #define keyClose sf::Keyboard::Escape
 #define keyFriction sf::Keyboard::F
 
+// input booleans
+bool keyClosePressed = false;
+bool keyFrictionPressed = false;
+bool frictionMode = false;
+// movement constants
+float circleInput = 20.0 / FPS;
+float autoMovement = 20.0 / FPS;
+// vector math
+//float getTime = TIMESTEP;
+float force = FORCE;
+float mass = 1.f/MASS;
+float friction = FRICTION;
 
-
- // input booleans
-    bool keyClosePressed = false;
-    bool keyFrictionPressed = false;
-    bool frictionMode = false;
-    // movement constants
-    float circleInput = 20.0 / FPS;
-    float autoMovement = 20.0 / FPS;
-    // vector math
-    //float getTime = TIMESTEP;
-    float force = FORCE;
-    float mass = 1.f/MASS;
-    float friction = FRICTION;
-
-    sf::Vector2f cPos( 0.0f, 0.0f );
-    sf::Vector2f cVel( 0.0f, 0.f );
-    sf::Vector2f cAcel(0.0f, 0.0f );
-    sf::CircleShape circ;
-    sf::CircleShape ocirc[50];
-    sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape v6.10" );
+sf::Vector2f cPos( 0.0f, 0.0f );
+sf::Vector2f cVel( 0.0f, 0.f );
+sf::Vector2f cAcel(0.0f, 0.0f );
+sf::CircleShape circ;
+sf::CircleShape ocirc[50];
+sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape me" );
 
 void otherballs(int size){
     for(int i = 0; i < size;i++){
@@ -51,9 +49,7 @@ void otherballs(int size){
         ocirc[i].setOrigin( 25.f, 25.f);
         ocirc[i].setPosition(i*80 + RADIUS, 50.f );
         ocirc[i].setFillColor(sf::Color::White);
-
     }
-
 }    
 
 void moveball(){
@@ -90,7 +86,27 @@ void boing(){
         }
 }
 
-int main() {
+int main( int argc, char *argv[] ) {
+    int size = 0;
+    if ( argc != 2 ) {
+        // if not enough or too many arguments
+        cout << "USAGE: " << argv[0] << " <int>" << endl;
+        cout << "The integer MUST be between 1 and 35, inclusive" << endl;
+        return 1;
+    }
+    else {
+        int x = atoi( argv[1] ); // convert from chararray to int
+        // cout << x << endl;
+        if ( x >= 1 && x <= 35 ) {
+            size = x;
+        }
+        else {
+            // if argument out of range
+            cout << "USAGE: " << argv[0] << " <int>" << endl;
+            cout << "The integer MUST be between 1 and 35, inclusive" << endl;
+            return 1;
+        }
+    }
 
     window.setFramerateLimit( FPS );
     window.setActive( false );
@@ -101,14 +117,8 @@ int main() {
     circ.setOrigin( RADIUS, RADIUS );
     circ.setFillColor( sf::Color::Red );
     circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
-
-    int size = 0;
-    cout << "Size: ?" << endl;
-    cin >> size;
-
-
-
-    otherballs( size);
+    
+    otherballs( size );
 
     while ( window.isOpen() ) {
         // handle input
