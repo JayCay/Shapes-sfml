@@ -8,13 +8,13 @@ using namespace std;
 #define RADIUS 30.0f
 #define WIDTH 800
 #define HEIGHT 600
-#define FPS 60
+#define FPS 60.f
 #define TIMESTEP 1.f/FPS
-#define FORCE 160.0f * TIMESTEP
+#define FORCE 160.0f 
 #define MASS 1.0f
 #define FRICTION 0.2f * TIMESTEP
 #define ELASTICITY 1.0f
-#define ACCELERATION FORCE/MASS
+
 // keybindings
 #define keyUp sf::Keyboard::W
 #define keyDown sf::Keyboard::S
@@ -23,18 +23,10 @@ using namespace std;
 #define keyClose sf::Keyboard::Escape
 #define keyFriction sf::Keyboard::F
 
-int main() {
-    sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape v6.10" );
-    window.setFramerateLimit( FPS );
-    window.setActive( false );
-    sf::CircleShape circ;
-    // input booleans
-    bool keyUpPressed = false;
-    bool keyDownPressed = false;
-    bool keyLeftPressed = false;
-    bool keyRightPressed = false;
+
+
+ // input booleans
     bool keyClosePressed = false;
-    bool buttonLeftPressed = false;
     bool keyFrictionPressed = false;
     bool frictionMode = false;
     // movement constants
@@ -43,67 +35,25 @@ int main() {
     // vector math
     //float getTime = TIMESTEP;
     float force = FORCE;
-    float mass = MASS;
+    float mass = 1.f/MASS;
     float friction = FRICTION;
-    float acceleration = ACCELERATION;
+
     sf::Vector2f cPos( 0.0f, 0.0f );
     sf::Vector2f cVel( 0.0f, 0.f );
-    // initialise drawing the circle
-    circ.setRadius( RADIUS );
-    circ.setOrigin( RADIUS, RADIUS );
-    circ.setFillColor( sf::Color::Red );
-    circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
+    sf::Vector2f cAcel(0.0f, 0.0f );
+    sf::CircleShape circ;
+    sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape v6.10" );
 
-    while ( window.isOpen() ) {
-        // handle input
-        sf::Event event;
-        while ( window.pollEvent(event) ) {
-            if ( event.type == sf::Event::Closed ) window.close();
-            // keyboard
-            if ( event.type == sf::Event::KeyPressed ) {
-                if ( event.key.code == keyUp ) keyUpPressed = true;
-                if ( event.key.code == keyDown ) keyDownPressed = true;
-                if ( event.key.code == keyLeft ) keyLeftPressed = true;
-                if ( event.key.code == keyRight ) keyRightPressed = true;
-                if ( event.key.code == keyClose ) keyClosePressed = true;
-                if ( event.key.code == keyFriction ) keyFrictionPressed = true;
-            }
-            if ( event.type == sf::Event::KeyReleased ) {
-                if ( event.key.code == keyUp ) keyUpPressed = false;
-                if ( event.key.code == keyDown ) keyDownPressed = false;
-                if ( event.key.code == keyLeft ) keyLeftPressed = false;
-                if ( event.key.code == keyRight ) keyRightPressed = false;
-                if ( event.key.code == keyClose ) keyClosePressed = false;
-                if ( event.key.code == keyFriction ) keyFrictionPressed = false;
-            }
-        }
+void moveball(){
+    cPos = circ.getPosition();
+    cVel += (cAcel * TIMESTEP);
+    cPos += (0.5f * cAcel * TIMESTEP * TIMESTEP) + (cVel * TIMESTEP);
+    if ( frictionMode )cVel -= ((friction *cVel)/mass);
+    circ.setPosition( cPos.x, cPos.y );
+}
 
-        if ( keyClosePressed ) {
-            keyClosePressed = false;
-            window.close();
-        }
-
-        //friction mode toggle
-        if ( keyFrictionPressed ) {
-            keyFrictionPressed = false;
-            frictionMode = !frictionMode;
-        }
-
-        //change ball's current velocity
-        if ( keyUpPressed ) cVel.y -= acceleration;
-        if ( keyDownPressed ) cVel.y +=  acceleration;
-        if ( keyLeftPressed ) cVel.x -= acceleration;
-        if ( keyRightPressed ) cVel.x += acceleration;
-        circ.setFillColor( sf::Color::Red );
-
-        //friction  mode
-        if ( frictionMode ) {
-            cVel -= ((friction *cVel)/mass);
-            circ.setFillColor( sf::Color::Blue );
-        }
-
-        cPos = circ.getPosition();
-
+void boing(){
+    cPos = circ.getPosition();
         //elasticity
         if ( cPos.y - RADIUS < 0.f ){   
             cPos.y = 0 + RADIUS;
@@ -122,11 +72,73 @@ int main() {
             cPos.x = WIDTH - RADIUS;
             cVel.x = -ELASTICITY * cVel.x;
         }
+}
 
-        cPos += cVel;
+int main() {
+
+    window.setFramerateLimit( FPS );
+    window.setActive( false );
+    window.setKeyRepeatEnabled(false);
+
+    // initialise drawing the circle
+    circ.setRadius( RADIUS );
+    circ.setOrigin( RADIUS, RADIUS );
+    circ.setFillColor( sf::Color::Red );
+    circ.setPosition( WIDTH / 2.f, HEIGHT / 2.f );
+
+    while ( window.isOpen() ) {
+        // handle input
+        sf::Event event;
+        while ( window.pollEvent(event) ) {
+            if ( event.type == sf::Event::Closed ) window.close();
+            // keyboard
+            if ( event.type == sf::Event::KeyPressed ) {
+                if ( event.key.code == keyUp ) cAcel.y -= (force * mass);
+                if ( event.key.code == keyDown ) cAcel.y +=  force * mass;
+                if ( event.key.code == keyLeft) cAcel.x -= (force * mass);
+                if ( event.key.code == keyRight) cAcel.x += force * mass;
+                if ( event.key.code == keyClose ) keyClosePressed = true;
+                if ( event.key.code == keyFriction ) keyFrictionPressed = true;
+            }
+            if ( event.type == sf::Event::KeyReleased ) {
+                if ( event.key.code == keyUp ) cAcel.y = 0;
+                if ( event.key.code == keyDown ) cAcel.y = 0;
+                if ( event.key.code == keyLeft ) cAcel.x = 0;
+                if ( event.key.code == keyRight ) cAcel.x = 0;
+                if ( event.key.code == keyClose ) keyClosePressed = false;
+                if ( event.key.code == keyFriction ) keyFrictionPressed = false;
+            } 
+
+        }
+        //close window
+        if ( keyClosePressed ) {
+            keyClosePressed = false;
+            window.close();
+        }
+
+        //friction mode toggle
+        if ( keyFrictionPressed ) {
+            keyFrictionPressed = false;
+            frictionMode = !frictionMode;
+        }
+
+        //default color
+        circ.setFillColor( sf::Color::Red );
+        //friction  mode
+        if ( frictionMode ) {
+            circ.setFillColor( sf::Color::Blue );
+        }
+
+
+        //elasticity
+        boing();
 
         //ball movement
-        circ.setPosition( cPos.x, cPos.y );
+        moveball();
+       
+
+        
+        cout << cAcel.x << " " << cAcel.y << " " << cVel.x << " " << cVel.y << endl;
 
         // draw game to screen
         window.clear( sf::Color::Black );
