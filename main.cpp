@@ -49,28 +49,32 @@ void moveball(){
     cVel += (cAcel * TIMESTEP);
     cPos += (0.5f * cAcel * TIMESTEP * TIMESTEP) + (cVel * TIMESTEP);
     if ( frictionMode )cVel -= ((friction *cVel)/mass);
-    circ.setPosition( cPos.x, cPos.y );
+    circ.setPosition( cPos );
 }
 
 void boing(){
     cPos = circ.getPosition();
         //elasticity
-        if ( cPos.y - RADIUS < 0.f ){   
+        if ( cPos.y  < 0.f + RADIUS ){   
             cPos.y = 0 + RADIUS;
             cVel.y = -ELASTICITY * cVel.y;
+            circ.setPosition( cPos );
             }
-        if (cPos.y + RADIUS > HEIGHT){
-            cPos.y = HEIGHT - RADIUS;
+        if (cPos.y > HEIGHT - 1.f - RADIUS){
+            cPos.y = HEIGHT - RADIUS -1.f;
             cVel.y = -ELASTICITY * cVel.y;
+            circ.setPosition( cPos );
         }
-        if ( cPos.x - RADIUS < 0.f){
+        if ( cPos.x < 0.f + RADIUS ){
             cPos.x = 0 + RADIUS;
             cVel.x = -ELASTICITY * cVel.x;
+            circ.setPosition( cPos );
         }
 
-        if(cPos.x + RADIUS > WIDTH ){
-            cPos.x = WIDTH - RADIUS;
+        if(cPos.x  > WIDTH -1.f - RADIUS ){
+            cPos.x = WIDTH - RADIUS -1.f;
             cVel.x = -ELASTICITY * cVel.x;
+            circ.setPosition( cPos );
         }
 }
 
