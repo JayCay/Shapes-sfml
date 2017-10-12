@@ -38,25 +38,25 @@ float friction = FRICTION;
 
 sf::Vector2f cPos( 0.0f, 0.0f );
 sf::Vector2f cVel( 0.0f, 0.f );
-sf::Vector2f cAcel(0.0f, 0.0f );
+sf::Vector2f cAcel( 0.0f, 0.0f );
 sf::CircleShape circ;
 sf::CircleShape ocirc[50];
 sf::RenderWindow window( sf::VideoMode( WIDTH, HEIGHT ), "shape me" );
 
 void otherballs(int size){
-    for(int i = 0; i < size;i++){
+    for( int i = 0; i < size; i++ ){
         ocirc[i].setRadius(25.f);
         ocirc[i].setOrigin( 25.f, 25.f);
-        ocirc[i].setPosition(i*80 + RADIUS, 50.f );
-        ocirc[i].setFillColor(sf::Color::White);
+        ocirc[i].setPosition( i * 80 + RADIUS, 50.f );
+        ocirc[i].setFillColor( sf::Color::White );
     }
 }    
 
 void moveball(){
     cPos = circ.getPosition();
-    cVel += (cAcel * TIMESTEP);
-    cPos += (0.5f * cAcel * TIMESTEP * TIMESTEP) + (cVel * TIMESTEP);
-    if ( frictionMode )cVel -= ((friction *cVel)/mass);
+    cVel += ( cAcel * TIMESTEP );
+    cPos += ( 0.5f * cAcel * TIMESTEP * TIMESTEP ) + ( cVel * TIMESTEP );
+    if ( frictionMode )cVel -= ( ( friction *cVel ) / mass );
     circ.setPosition( cPos );
 }
 
@@ -87,24 +87,23 @@ void boing(){
 }
 
 int main( int argc, char *argv[] ) {
+    // get number of other circles through cmd args
     int size = 0;
     if ( argc != 2 ) {
         // if not enough or too many arguments
         cout << "USAGE: " << argv[0] << " <int>" << endl;
         cout << "The integer MUST be between 1 and 35, inclusive" << endl;
-        return 1;
+        return 1; // terminate with errorlevel 1
     }
     else {
         int x = atoi( argv[1] ); // convert from chararray to int
         // cout << x << endl;
-        if ( x >= 1 && x <= 35 ) {
-            size = x;
-        }
+        if ( x >= 1 && x <= 35 ) size = x;
         else {
             // if argument out of range
             cout << "USAGE: " << argv[0] << " <int>" << endl;
             cout << "The integer MUST be between 1 and 35, inclusive" << endl;
-            return 1;
+            return 1; // terminate with errorlevel 1
         }
     }
 
@@ -125,7 +124,6 @@ int main( int argc, char *argv[] ) {
         sf::Event event;
         while ( window.pollEvent(event) ) {
             if ( event.type == sf::Event::Closed ) window.close();
-            // keyboard
             if ( event.type == sf::Event::KeyPressed ) {
                 if ( event.key.code == keyUp ) cAcel.y -= (force * mass);
                 if ( event.key.code == keyDown ) cAcel.y +=  force * mass;
@@ -144,40 +142,28 @@ int main( int argc, char *argv[] ) {
             } 
 
         }
-        //close window
+        // close window
         if ( keyClosePressed ) {
             keyClosePressed = false;
             window.close();
         }
 
-        //friction mode toggle
+        // friction mode toggle
         if ( keyFrictionPressed ) {
             keyFrictionPressed = false;
             frictionMode = !frictionMode;
         }
 
-        //default color
-        circ.setFillColor( sf::Color::Red );
-        //friction  mode
-        if ( frictionMode ) {
-            circ.setFillColor( sf::Color::Blue );
-        }
-
-
-        //elasticity
-        boing();
-
-        //ball movement
-        moveball();
-       
-
-        
-        cout << cAcel.x << " " << cAcel.y << " " << cVel.x << " " << cVel.y << endl;
+        circ.setFillColor( sf::Color::Red ); // default color
+        if ( frictionMode ) circ.setFillColor( sf::Color::Blue ); // friction mode color
+        boing(); // ball elasticity function
+        moveball(); // ball movement function
+        cout << cAcel.x << " " << cAcel.y << " " << cVel.x << " " << cVel.y << endl; // DEBUG print data to console
 
         // draw game to screen
         window.clear( sf::Color::Black );
         window.draw( circ );
-        for( int i =0; i < size; i++) window.draw( ocirc[i]);
+        for( int i = 0; i < size; i++) window.draw( ocirc[i] );
         window.display();
     }
 
