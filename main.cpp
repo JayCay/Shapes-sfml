@@ -109,6 +109,70 @@ void boing(int size){
     }
 }
 
+void bangga(){
+   // for ( int i = 0; i < size; i++ ) {
+    int i = 0;
+    cPos[i] = circ[i].getPosition();
+    cPos[i+1] = circ[i+1].getPosition();
+    //if (i == 0){
+    float radSumSqr = (RADIUS + ORADIUS) * (RADIUS + ORADIUS);
+    float distanceSqr = ((cPos[i].x - cPos[i+1].x)*(cPos[i].x - cPos[i+1].x)) + ((cPos[i].y - cPos[i+1].y) * (cPos[i].y - cPos[i+1].y));
+    sf::Vector2f cNormBA[2];
+    sf::Vector2f rVelAB[2];
+    float j;
+    cNormBA[i] = (cPos[i] - cPos[i+1]);
+    rVelAB[i] = (cVel[i] - cVel[i+1]);
+    j = -( (1 + ELASTICITY) * ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) )
+    /
+    ( ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) * (mass + omass));
+
+    if(radSumSqr > distanceSqr ){
+
+      if ((cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) < 0.f ){
+
+        cVel[i] = ((j/mass) * cNormBA[i]);
+        cVel[i+1] = ((j/omass) * cNormBA[i]);
+        circ[i].setPosition(cPos[i]);
+        circ[i+1].setPosition(cPos[i+1]);
+            }
+        }
+    }  
+       // }
+    //}
+    /**
+    else{
+    radSumSqr = (ORADIUS + ORADIUS) * (ORADIUS + ORADIUS);
+    distanceSqr = ((cPos[i].x - Pos[i+1].x)*(cPos[i].x - oPos[i+1].x)) + ((cPos[i].y - oPos[i+1].y) * (cPos[i].y - oPos[i+1].y));
+    sf::Vector2f cNormBA[36];
+    sf::Vector2f rVelAB[36];
+    sf::Vector2f j[36];
+    cNormBA[i] = (cPos[i] - cPos[i+1]);
+    rVelAB[i] = (cVel[i] - cVel[i+1])
+    j[i] = (–( (1 + ELASTICITY) * ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) )
+    /
+    ( ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) )
+    * (omass
+    + omass) ) )
+
+    if(radSumSqr >= distanceSqr ){
+
+      if ((cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) < 0.f ){
+
+        cVel[i] += ((j[i]/omass) * cNormBA[i]);
+        cVel[i+1] += ((j[i]/omass) * cNormBA[i]);
+        cPos[i] += cVel[i];
+        cPos[i+1] += cVel[i+1];
+        circ[i].setPosition(cPos[i]);
+        circ[i+1].setPosition(cPos[i+1])
+            }  
+        }
+
+    }
+  }
+}
+*/
+
+
 int main( int argc, char *argv[] ) {
     // get number of other circles through cmd args
     int size = 0;
@@ -191,6 +255,7 @@ int main( int argc, char *argv[] ) {
         } 
         boing(size); // ball elasticity function
         moveball(size); // ball movement function
+        bangga();
         cout << cAcel[0].x << " " << cAcel[0].y << " " << cVel[0].x << " " << cVel[0].y << endl; // DEBUG print data to console
 
         // draw game to screen
