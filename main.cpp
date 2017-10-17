@@ -11,11 +11,11 @@ using namespace std;
 #define HEIGHT 600
 #define FPS 60.f
 #define TIMESTEP 1.f/FPS
-#define FORCE 160.0f 
-#define MASS 1.0f
+#define FORCE 10000.0f
+#define MASS 10.0f
 #define FRICTION 0.2f * TIMESTEP
 #define ELASTICITY 1.0f
-#define OMASS 0.5f
+#define OMASS 10.f
 
 // keybindings
 #define keyUp sf::Keyboard::W
@@ -109,70 +109,43 @@ void boing(int size){
     }
 }
 
-void bangga(){
-   // for ( int i = 0; i < size; i++ ) {
-    int i = 0;
-    cPos[i] = circ[i].getPosition();
-    cPos[i+1] = circ[i+1].getPosition();
+void bangga(int size){
+//void bangga(){
+    for ( int i = 0; i < size; i++ ) {
+    //int i = 0;
+    sf::Vector2f aPos = circ[i].getPosition();
+    for (int x = 0; x < i; x++){
+        if(i != x){
+    sf::Vector2f bPos = circ[x].getPosition();
     //if (i == 0){
     float radSumSqr = (RADIUS + ORADIUS) * (RADIUS + ORADIUS);
-    float distanceSqr = ((cPos[i].x - cPos[i+1].x)*(cPos[i].x - cPos[i+1].x)) + ((cPos[i].y - cPos[i+1].y) * (cPos[i].y - cPos[i+1].y));
-    sf::Vector2f cNormBA[2];
-    sf::Vector2f rVelAB[2];
-    float j;
-    cNormBA[i] = (cPos[i] - cPos[i+1]);
-    rVelAB[i] = (cVel[i] - cVel[i+1]);
-    j = -( (1 + ELASTICITY) * ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) )
-    /
-    ( ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) * (mass + omass));
+    float distanceSqr = ((aPos.x - bPos.x)*(aPos.x - bPos.x)) + ((aPos.y - bPos.y) * (aPos.y - bPos.y));
+
 
     if(radSumSqr > distanceSqr ){
+        sf::Vector2f cNormBA  = (aPos - bPos);
+        sf::Vector2f rVelAB= (cVel[i] - cVel[x]);
+    float j;
+    j = (-( (1 + ELASTICITY) * ( (cNormBA.x * rVelAB.x) + (cNormBA.y * rVelAB.y) ) ))
+    /
+    ( ( (cNormBA.x * cNormBA.x) + (cNormBA.y * cNormBA.y) ) * (mass + mass));
 
-      if ((cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) < 0.f ){
+      if ((cNormBA.x * rVelAB.x) + (cNormBA.y * rVelAB.y) < 0.f ){
 
-        cVel[i] = ((j/mass) * cNormBA[i]);
-        cVel[i+1] = ((j/omass) * cNormBA[i]);
-        circ[i].setPosition(cPos[i]);
-        circ[i+1].setPosition(cPos[i+1]);
+        cVel[i] = ((j/mass) * cNormBA);
+        cVel[x] = -((j/mass) * cNormBA);
+        
+        aPos += cVel[i];
+        bPos += cVel[x];
+        //circ[i].setPosition(aPos);
+        //circ[i+1].setPosition(bPos);
             }
         }
+       }
+     }
     }  
-       // }
-    //}
-    /**
-    else{
-    radSumSqr = (ORADIUS + ORADIUS) * (ORADIUS + ORADIUS);
-    distanceSqr = ((cPos[i].x - Pos[i+1].x)*(cPos[i].x - oPos[i+1].x)) + ((cPos[i].y - oPos[i+1].y) * (cPos[i].y - oPos[i+1].y));
-    sf::Vector2f cNormBA[36];
-    sf::Vector2f rVelAB[36];
-    sf::Vector2f j[36];
-    cNormBA[i] = (cPos[i] - cPos[i+1]);
-    rVelAB[i] = (cVel[i] - cVel[i+1])
-    j[i] = (–( (1 + ELASTICITY) * ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) ) )
-    /
-    ( ( (cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) )
-    * (omass
-    + omass) ) )
-
-    if(radSumSqr >= distanceSqr ){
-
-      if ((cNormBA[i].x * rVelAB[i].x) + (cNormBA[i].y * rVelAB[i].y) < 0.f ){
-
-        cVel[i] += ((j[i]/omass) * cNormBA[i]);
-        cVel[i+1] += ((j[i]/omass) * cNormBA[i]);
-        cPos[i] += cVel[i];
-        cPos[i+1] += cVel[i+1];
-        circ[i].setPosition(cPos[i]);
-        circ[i+1].setPosition(cPos[i+1])
-            }  
-        }
-
-    }
-  }
 }
-*/
-
-
+   
 int main( int argc, char *argv[] ) {
     // get number of other circles through cmd args
     int size = 0;
@@ -253,9 +226,11 @@ int main( int argc, char *argv[] ) {
         if ( frictionMode ) {circ[0].setFillColor( sf::Color::Blue );
             for( int i = 1; i < size; i++) circ[i].setFillColor( sf::Color::White );
         } 
-        boing(size); // ball elasticity function
+        
         moveball(size); // ball movement function
-        bangga();
+        boing(size); // ball elasticity function
+        bangga(size);
+        //bangga();
         cout << cAcel[0].x << " " << cAcel[0].y << " " << cVel[0].x << " " << cVel[0].y << endl; // DEBUG print data to console
 
         // draw game to screen
