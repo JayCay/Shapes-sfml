@@ -25,22 +25,8 @@ float movement = 20.0 / FPS;
 //	}
 //}
 
-float d2r(float degree){
-	return (degree * M_PI)/180;
-}
-
-void drawaabb(float x, float y, int i, sf::RectangleShape rect[]){
-
-		aabb[i].setSize(sf::Vector2f(x, y));
-		aabb[i].setFillColor(sf::Color::Transparent); 
-		aabb[i].setOutlineColor(sf::Color::Red);
-		aabb[i].setOutlineThickness(1);
-		aabb[i].setOrigin(rect[i].getOrigin());
-		aabb[i].setPosition(rect[i].getPosition());
-	
 
 
-}
 
 int main() {
 	srand( time( NULL ) );
@@ -99,9 +85,7 @@ int main() {
 			if ( event.type == sf::Event::Closed ) window.close();
 		}
 
-		for ( int i = 0; i <RecSIZE;i++){
-			o_angle[i] = n_angle[i];
-		}
+		
 
 		rect[0].rotate(5 * TIMESTEP);
 		rect[1].rotate(2 * TIMESTEP);
@@ -118,9 +102,12 @@ int main() {
 		for ( int i = 0; i < RecSIZE; i++ ){
 		float x_o = oaabb[i].getSize().x;
 		float y_o = oaabb[i].getSize().y;		
-		float x_n = (x_o * std::cos((n_angle[i]* M_PI/180))) - (y_o * std::sin((n_angle[i]* M_PI/180)));
-		float y_n = (y_o * std::cos((n_angle[i]* M_PI/180))) + (x_o * std::sin((n_angle[i]* M_PI/180)));
-		drawaabb(x_n,y_n, i, rect);
+		float x_n = (x_o * abs(std::cos((n_angle[i]* M_PI/180)))) + (y_o * abs(std::sin((n_angle[i]* M_PI/180))));
+		float y_n = (y_o * abs(std::cos((n_angle[i]* M_PI/180)))) + (x_o * abs(std::sin((n_angle[i]* M_PI/180))));
+		//drawaabb(x_n,y_n, i, rect);
+		aabb[i].setSize(sf::Vector2f(x_n,y_n));
+		aabb[i].setPosition(rect[i].getPosition());
+
 		}
 
 		window.clear( sf::Color::Black );
