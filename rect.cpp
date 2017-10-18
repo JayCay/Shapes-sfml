@@ -90,8 +90,8 @@ int main() {
 		for ( int i = 0; i < RecSIZE; i++ ){
 		float x_o = oaabb[i].getSize().x;
 		float y_o = oaabb[i].getSize().y;		
-		float x_n = (x_o * abs(std::cos((angle[i]* M_PI/180)))) + (y_o * abs(std::sin((angle[i]* M_PI/180))));
-		float y_n = (y_o * abs(std::cos((angle[i]* M_PI/180)))) + (x_o * abs(std::sin((angle[i]* M_PI/180))));
+		float x_n = (x_o * abs(cos((angle[i]* M_PI/180)))) + (y_o * abs(sin((angle[i]* M_PI/180))));
+		float y_n = (y_o * abs(cos((angle[i]* M_PI/180)))) + (x_o * abs(sin((angle[i]* M_PI/180))));
 		aabb[i].setSize(sf::Vector2f(x_n,y_n));
 		aabb[i].setOrigin(x_n/2,y_n/2);
 		aabb[i].setPosition(rect[i].getPosition());
