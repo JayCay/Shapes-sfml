@@ -7,6 +7,11 @@
 #define WIDTH 800
 #define HEIGHT 600
 #define TIMESTEP 1.f/FPS
+#define THETA1 5
+#define THETA2 2
+#define THETA3 3
+#define THETA4 10
+#define THETA5 7
 
 using namespace std;
 
@@ -68,18 +73,18 @@ int main() {
 
 		
 		//Rectangle rotation
-		rect[0].rotate(5 * TIMESTEP);
-		rect[1].rotate(2 * TIMESTEP);
-		rect[2].rotate(3 * TIMESTEP);
-		rect[3].rotate(10 * TIMESTEP);
-		rect[4].rotate(7 * TIMESTEP);
+		rect[0].rotate(THETA1 * TIMESTEP);
+		rect[1].rotate(THETA2 * TIMESTEP);
+		rect[2].rotate(THETA3 * TIMESTEP);
+		rect[3].rotate(THETA4 * TIMESTEP);
+		rect[4].rotate(THETA5 * TIMESTEP);
 
 		//theta
-		angle[0] +=  5 * TIMESTEP;
-		angle[1] +=  2 * TIMESTEP;
-		angle[2] +=  3 * TIMESTEP;
-		angle[3] += 10 * TIMESTEP;
-		angle[4] += 7 * TIMESTEP;
+		angle[0] +=  THETA1 * TIMESTEP;
+		angle[1] +=  THETA2 * TIMESTEP;
+		angle[2] +=  THETA3 * TIMESTEP;
+		angle[3] +=  THETA4 * TIMESTEP;
+		angle[4] +=  THETA5 * TIMESTEP;
 
 		//drawing new aabbs
 		for ( int i = 0; i < RecSIZE; i++ ){
