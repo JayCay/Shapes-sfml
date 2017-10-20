@@ -3,15 +3,17 @@
 #include <cmath>
 
 #define FPS 60
-#define RecSIZE 5
+#define RecSIZE 7
 #define WIDTH 800
 #define HEIGHT 600
 #define TIMESTEP 1.f/FPS
-#define THETA1 5
-#define THETA2 2
-#define THETA3 3
-#define THETA4 10
-#define THETA5 7
+#define THETA1 1
+#define THETA2 4
+#define THETA3 8
+#define THETA4 12
+#define THETA5 15
+#define THETA6 20
+#define THETA7 50
 
 using namespace std;
 
@@ -33,11 +35,14 @@ int main() {
 	int sizeh = 0;
 	
 	//Making the Rectangles
-	rect[0].setSize( sf::Vector2f( 225.f, 100.f ) );
-	rect[1].setSize( sf::Vector2f( 90.f, 160.f ) );
-	rect[2].setSize( sf::Vector2f( 640.f, 90.f ) );
-	rect[3].setSize( sf::Vector2f( 40.f, 80.f ) );
-	rect[4].setSize( sf::Vector2f( 180.f, 70.f ) );
+	rect[0].setSize( sf::Vector2f( 65.f, 190.f ) );
+	rect[1].setSize( sf::Vector2f( 50.f, 200.f ) );
+	rect[2].setSize( sf::Vector2f( 20.f, 28.f ) );
+	rect[3].setSize( sf::Vector2f( 200.f, 200.f ) );
+	rect[4].setSize( sf::Vector2f( 280.f, 50.f ) );
+	rect[5].setSize( sf::Vector2f( 310.f, 70.f ) );
+	rect[6].setSize( sf::Vector2f( 300.f, 45.f ) );
+
 	for ( int i = 0; i < RecSIZE; i++ ) {
 		//posw = rand() % WIDTH + 1;
 		//posh = rand() % HEIGHT + 1;
@@ -47,11 +52,13 @@ int main() {
 		//rect[i].setPosition( 400, 300 );
 		rect[i].setFillColor( sf::Color::Green );
 	}
-	rect[0].setPosition( 220 , 125 );
-	rect[1].setPosition( 640, 100 );
-	rect[2].setPosition( 400, 300 );
-	rect[3].setPosition( 85 , 510 );
-	rect[4].setPosition( 595 , 455 );
+	rect[0].setPosition( 120 , 495 );
+	rect[1].setPosition( 100, 140 );
+	rect[2].setPosition( 640, 415 );
+	rect[3].setPosition( 375 , 310 );
+	rect[4].setPosition( 600 , 489 );
+	rect[5].setPosition( 400 , 600 );
+	rect[6].setPosition( 430 , 50 );
 
 
 	//Making the first aabbs
@@ -78,6 +85,8 @@ int main() {
 		rect[2].rotate(THETA3 * TIMESTEP);
 		rect[3].rotate(THETA4 * TIMESTEP);
 		rect[4].rotate(THETA5 * TIMESTEP);
+		rect[5].rotate(THETA6 * TIMESTEP);
+		rect[6].rotate(THETA7 * TIMESTEP);
 
 		//theta
 		angle[0] +=  THETA1 * TIMESTEP;
@@ -85,6 +94,8 @@ int main() {
 		angle[2] +=  THETA3 * TIMESTEP;
 		angle[3] +=  THETA4 * TIMESTEP;
 		angle[4] +=  THETA5 * TIMESTEP;
+		angle[5] +=  THETA6 * TIMESTEP;
+		angle[6] +=  THETA7 * TIMESTEP;
 
 		//drawing new aabbs
 		for ( int i = 0; i < RecSIZE; i++ ){
