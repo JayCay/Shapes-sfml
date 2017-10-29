@@ -1,26 +1,37 @@
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <cmath>
+#include <stdlib.h>
 
 #define FPS 60
 #define RecSIZE 7
 #define WIDTH 800
 #define HEIGHT 600
 #define TIMESTEP 1.f/FPS
-#define THETA1 1
-#define THETA2 4
-#define THETA3 8
-#define THETA4 12
-#define THETA5 15
-#define THETA6 20
-#define THETA7 50
+
+#define keyUp sf::Keyboard::W
+#define keyDown sf::Keyboard::S
+#define keyLeft sf::Keyboard::A
+#define keyRight sf::Keyboard::D
+#define keyClose sf::Keyboard::Escape
+#define keyRotate sf::Keyboard::F
 
 using namespace std;
 
+bool keyDownPressed = false;
+bool keyUpPressed = false;
+bool keyLeftPressed = false;
+bool keyRightPressed = false;
+bool keyClosePressed = false;
+bool keyRotatePressed = false;
+bool rotateMode = false;
+
+
 sf::RectangleShape rect[RecSIZE];
-sf::RectangleShape aabb[RecSIZE];
-sf::RectangleShape oaabb[RecSIZE];
-float angle[RecSIZE];
+sf::ConvexShape shapesArray[9999];
+sf::FloatRect aabb[9999];
+sf::FloatRect oaabb[9999];
+
 
 int main() {
 	srand( time( NULL ) );
@@ -34,70 +45,90 @@ int main() {
 	int sizew = 0;
 	int sizeh = 0;
 	
-	//Making the Rectangles
-	rect[0].setSize( sf::Vector2f( 65.f, 190.f ) );
-	rect[1].setSize( sf::Vector2f( 50.f, 200.f ) );
-	rect[2].setSize( sf::Vector2f( 20.f, 28.f ) );
-	rect[3].setSize( sf::Vector2f( 200.f, 200.f ) );
-	rect[4].setSize( sf::Vector2f( 280.f, 50.f ) );
-	rect[5].setSize( sf::Vector2f( 310.f, 70.f ) );
-	rect[6].setSize( sf::Vector2f( 300.f, 45.f ) );
+	int numShapes;
+	cin >> numShapes;
 
-	for ( int i = 0; i < RecSIZE; i++ ) {
-		//posw = rand() % WIDTH + 1;
-		//posh = rand() % HEIGHT + 1;
-		sizew = ( ( rect[i].getSize().x ) / 2 );
-		sizeh = ( ( rect[i].getSize().y ) / 2 );
-		rect[i].setOrigin( sizew, sizeh );
-		//rect[i].setPosition( 400, 300 );
-		rect[i].setFillColor( sf::Color::Green );
-	}
-	rect[0].setPosition( 120 , 495 );
-	rect[1].setPosition( 100, 140 );
-	rect[2].setPosition( 640, 415 );
-	rect[3].setPosition( 375 , 310 );
-	rect[4].setPosition( 600 , 489 );
-	rect[5].setPosition( 400 , 600 );
-	rect[6].setPosition( 430 , 50 );
+	for (int i = 0; i < numShapes; i++) {
+		int numPoints;
+		cin >> numPoints;
+		shapesArray[i].setPointCount(numPoints);
+		for (int j = 0; j < numPoints; j++) {
+			float x, y;
+			cin >> x;
+			cin >> y;
+			sf::Vector2f point(x,y);
+			shapesArray[i].setPoint(j, point);
+		}
+		int posX, posY;
+		cin >> posX;
+		cin >> posY;
+		shapesArray[i].setPosition(posX, posY);
+		oaabb[i] = shapesArray[i].getLocalBounds();
+		shapesArray[i].setOrigin(oaabb[i].left + oaabb[i].width/2, oaabb[i].top + oaabb[i].height/2);
+		shapesArray[i].setFillColor(sf::Color::Blue);
 
-
-	//Making the first aabbs
-	for (int i = 0;i < RecSIZE;i++){
-		aabb[i].setSize(sf::Vector2f(rect[i].getSize()));
-		oaabb[i].setSize(sf::Vector2f(rect[i].getSize()));
-		aabb[i].setFillColor(sf::Color::Transparent); 
-		aabb[i].setOutlineColor(sf::Color::Red);
-		aabb[i].setOutlineThickness(1);
-		aabb[i].setOrigin( rect[i].getOrigin() );
-		aabb[i].setPosition(rect[i].getPosition());
 	}
 
 	while ( window.isOpen() ) {
 		sf::Event event;
 		while ( window.pollEvent( event ) ) {
-			if ( event.type == sf::Event::Closed ) window.close();
+            if ( event.type == sf::Event::Closed ) window.close();
+            if ( event.type == sf::Event::KeyPressed ) {
+                if ( event.key.code == keyUp ) keyUpPressed = true;
+                if ( event.key.code == keyDown ) keyDownPressed = true;
+                if ( event.key.code == keyLeft) keyLeftPressed = true;
+                if ( event.key.code == keyRight) keyRightPressed = true;
+                if ( event.key.code == keyClose ) keyClosePressed = true;
+                if ( event.key.code == keyRotate ) keyRotatePressed = true;
+            }
+            if ( event.type == sf::Event::KeyReleased ) {
+                if ( event.key.code == keyUp ) keyUpPressed =  false;
+                if ( event.key.code == keyDown ) keyDownPressed = false;
+                if ( event.key.code == keyLeft ) keyLeftPressed = false;
+                if ( event.key.code == keyRight ) keyRightPressed = false;
+                if ( event.key.code == keyClose ) keyClosePressed = false;
+                if ( event.key.code == keyRotate ) keyRotatePressed = false;
+            } 
 		}
 
 		
-		//Rectangle rotation
-		rect[0].rotate(THETA1 * TIMESTEP);
-		rect[1].rotate(THETA2 * TIMESTEP);
-		rect[2].rotate(THETA3 * TIMESTEP);
-		rect[3].rotate(THETA4 * TIMESTEP);
-		rect[4].rotate(THETA5 * TIMESTEP);
-		rect[5].rotate(THETA6 * TIMESTEP);
-		rect[6].rotate(THETA7 * TIMESTEP);
+		//polygon movement
+		if ( keyUpPressed ) shapesArray[0].move(0,-50*TIMESTEP);
+        if ( keyDownPressed ) shapesArray[0].move(0,50*TIMESTEP);
+        if ( keyLeftPressed ) shapesArray[0].move(-50*TIMESTEP,0);
+        if ( keyRightPressed ) shapesArray[0].move(50*TIMESTEP,0);
 
-		//theta
-		angle[0] +=  THETA1 * TIMESTEP;
-		angle[1] +=  THETA2 * TIMESTEP;
-		angle[2] +=  THETA3 * TIMESTEP;
-		angle[3] +=  THETA4 * TIMESTEP;
-		angle[4] +=  THETA5 * TIMESTEP;
-		angle[5] +=  THETA6 * TIMESTEP;
-		angle[6] +=  THETA7 * TIMESTEP;
 
+        //rotate mode toggle
+        if ( keyRotatePressed ) {
+            keyRotatePressed = false;
+            rotateMode = !rotateMode;
+        }
+        //polygon rotation
+        if (rotateMode){
+        	for(int i = 0; i < numShapes; i++){
+			shapesArray[i].rotate(10 * TIMESTEP);
+			}
+        }
+
+        /*
+        //get aabbs
+        for(int i = 0; i < numShapes; i++){
+		sf::Vector2f min = shapesArray[i].getTransform().transformPoint(shapesArray[i].getPoint(0));
+		sf::Vector2f max = min;
+		for(int x = 1; x < shapesArray[i].getPointCount(); ++x){
+			sf::Vector2f point = shapesArray[i].getTransform().transformPoint(shapesArray[i].getPoint(x));
+			min.x = min(min.x, point.x);
+			max.x = max(max.x, point.x);
+			min.y = min(min.y, point.y);
+			max.y = max(max.y, point.y);
+		}
+		aabb[i] = FloatRect(min, max-min);
+		aabb[i].setFillColor(sf::Color::Transparent);
+		aabb[i].setOutlineColor(sf::Color::Red);
+		aabb[i].setOutlineThickness(1)
 		//drawing new aabbs
+		/*
 		for ( int i = 0; i < RecSIZE; i++ ){
 		float x_o = oaabb[i].getSize().x;
 		float y_o = oaabb[i].getSize().y;		
@@ -107,14 +138,15 @@ int main() {
 		aabb[i].setOrigin(x_n/2,y_n/2);
 		aabb[i].setPosition(rect[i].getPosition());
 		}
-
-		//default rectangle color
-		for (int i = 0;i < RecSIZE;i++){
-			rect[i].setFillColor(sf::Color::Green);
+	*/
+		//default polygon coflor
+		for (int i = 0;i < numShapes;i++){
+			shapesArray[i].setFillColor(sf::Color::Blue);
 		}
 
 		//collision detection
-		for ( int i = 0; i < RecSIZE; i++ ){
+		
+		/*for ( int i = 0; i < RecSIZE; i++ ){
 				float c1x = aabb[i].getPosition().x;
 				float c1y = aabb[i].getPosition().y;
 
@@ -141,10 +173,11 @@ int main() {
 				}
 			}
 		}
+		*/
 		window.clear( sf::Color::Black );
-		for ( int i = 0; i < RecSIZE; i++ ){
-		window.draw( rect[i] );
-		window.draw( aabb[i] );
+		for ( int i = 0; i < numShapes; i++ ){
+		window.draw( shapesArray[i] );
+		//window.draw( aabb[i] );
 		}
 		window.display();
 
