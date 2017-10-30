@@ -27,10 +27,12 @@ bool keyRotatePressed = false;
 bool rotateMode = false;
 
 
-sf::RectangleShape rect[RecSIZE];
+
 sf::ConvexShape shapesArray[9999];
 sf::FloatRect aabb[9999];
+sf::RectangleShape drawaabb[9999] ;
 sf::FloatRect oaabb[9999];
+
 
 
 int main() {
@@ -111,22 +113,25 @@ int main() {
 			}
         }
 
-        /*
+        
         //get aabbs
         for(int i = 0; i < numShapes; i++){
-		sf::Vector2f min = shapesArray[i].getTransform().transformPoint(shapesArray[i].getPoint(0));
-		sf::Vector2f max = min;
+		sf::Vector2f minimum = shapesArray[i].getTransform().transformPoint(shapesArray[i].getPoint(0));
+		sf::Vector2f maximum = minimum;
 		for(int x = 1; x < shapesArray[i].getPointCount(); ++x){
 			sf::Vector2f point = shapesArray[i].getTransform().transformPoint(shapesArray[i].getPoint(x));
-			min.x = min(min.x, point.x);
-			max.x = max(max.x, point.x);
-			min.y = min(min.y, point.y);
-			max.y = max(max.y, point.y);
+			minimum.x = min(minimum.x, point.x);
+			maximum.x = max(maximum.x, point.x);
+			minimum.y = min(minimum.y, point.y);
+			maximum.y = max(maximum.y, point.y);
 		}
-		aabb[i] = FloatRect(min, max-min);
-		aabb[i].setFillColor(sf::Color::Transparent);
-		aabb[i].setOutlineColor(sf::Color::Red);
-		aabb[i].setOutlineThickness(1)
+		aabb[i] = sf::FloatRect(minimum, maximum - minimum);
+		drawaabb[i].setSize(sf::Vector2f(aabb[i].width,aabb[i].height));
+		drawaabb[i].setPosition(aabb[i].left,aabb[i].top);
+		drawaabb[i].setFillColor(sf::Color::Transparent);
+		drawaabb[i].setOutlineColor(sf::Color::Red);
+		drawaabb[i].setOutlineThickness(1);
+	}
 		//drawing new aabbs
 		/*
 		for ( int i = 0; i < RecSIZE; i++ ){
@@ -177,7 +182,7 @@ int main() {
 		window.clear( sf::Color::Black );
 		for ( int i = 0; i < numShapes; i++ ){
 		window.draw( shapesArray[i] );
-		//window.draw( aabb[i] );
+		window.draw( drawaabb[i] );
 		}
 		window.display();
 
