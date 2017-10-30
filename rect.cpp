@@ -32,7 +32,7 @@ sf::ConvexShape shapesArray[9999];
 sf::FloatRect aabb[9999];
 sf::RectangleShape drawaabb[9999] ;
 sf::FloatRect oaabb[9999];
-
+sf::Vector2f colcheck[9999];
 
 
 int main() {
@@ -131,6 +131,7 @@ int main() {
 		drawaabb[i].setFillColor(sf::Color::Transparent);
 		drawaabb[i].setOutlineColor(sf::Color::Red);
 		drawaabb[i].setOutlineThickness(1);
+		colcheck[i] = sf::Vector2f(aabb[i].left,aabb[i].top);
 	}
 		//drawing new aabbs
 		/*
@@ -151,34 +152,25 @@ int main() {
 
 		//collision detection
 		
-		/*for ( int i = 0; i < RecSIZE; i++ ){
-				float c1x = aabb[i].getPosition().x;
-				float c1y = aabb[i].getPosition().y;
-
-				float rad1x = aabb[i].getSize().x / 2;
-				float rad1y = aabb[i].getSize().y / 2;
+		for ( int i = 0; i < numShapes; i++ ){
+			sf::Vector2f i2x;
 			for (int x = 0;x < i;x++){
 				if (i != x){
-				float c2x = aabb[x].getPosition().x;
-				float c2y = aabb[x].getPosition().y;
-
-				float rad2x = aabb[x].getSize().x / 2;
-				float rad2y = aabb[x].getSize().y / 2;
-			 
-				if(abs(c1x - c2x) > (rad1x + rad2x) || abs(c1y - c2y)  > (rad1y + rad2y))
+				i2x = colcheck[i] - colcheck[x];
+				if(i2x.x > drawaabb[x].getSize().x|| -i2x.x > drawaabb[i].getSize().x || i2x.y > drawaabb[x].getSize().y || -i2x.y > drawaabb[i].getSize().y)
 				{
 					//no colllision
 					}
 				else{
 					//collision detected
 					//rectangle change color
-					rect[i].setFillColor(sf::Color::Blue);
-					rect[x].setFillColor(sf::Color::Blue);
+					shapesArray[i].setFillColor(sf::Color::Green);
+					shapesArray[x].setFillColor(sf::Color::Green);
 					}
 				}
 			}
 		}
-		*/
+		
 		window.clear( sf::Color::Black );
 		for ( int i = 0; i < numShapes; i++ ){
 		window.draw( shapesArray[i] );
