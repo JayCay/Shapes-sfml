@@ -34,6 +34,12 @@ sf::RectangleShape drawaabb[9999] ;
 sf::FloatRect oaabb[9999];
 sf::Vector2f colcheck[9999];
 
+sf::Vector2f per(sf::Vector2f v){
+	sf::Vector2f per(-v.y, v.x);
+	return per;
+}
+
+
 
 int main() {
 	srand( time( NULL ) );
@@ -67,8 +73,9 @@ int main() {
 		shapesArray[i].setPosition(posX, posY);
 		oaabb[i] = shapesArray[i].getLocalBounds();
 		shapesArray[i].setOrigin(oaabb[i].left + oaabb[i].width/2, oaabb[i].top + oaabb[i].height/2);
-		shapesArray[i].setFillColor(sf::Color::Blue);
-
+		shapesArray[i].setFillColor(sf::Color::Green);
+		shapesArray[i].setOutlineColor(sf::Color::Magenta);
+		shapesArray[i].setOutlineThickness(2);
 	}
 
 	while ( window.isOpen() ) {
@@ -109,7 +116,7 @@ int main() {
         //polygon rotation
         if (rotateMode){
         	for(int i = 0; i < numShapes; i++){
-			shapesArray[i].rotate(10 * TIMESTEP);
+			shapesArray[i].rotate((i + 1) +(3 * TIMESTEP) );
 			}
         }
 
@@ -147,7 +154,7 @@ int main() {
 	*/
 		//default polygon coflor
 		for (int i = 0;i < numShapes;i++){
-			shapesArray[i].setFillColor(sf::Color::Blue);
+			shapesArray[i].setFillColor(sf::Color::Green);
 		}
 
 		//collision detection
@@ -164,8 +171,8 @@ int main() {
 				else{
 					//collision detected
 					//rectangle change color
-					shapesArray[i].setFillColor(sf::Color::Green);
-					shapesArray[x].setFillColor(sf::Color::Green);
+					shapesArray[i].setFillColor(sf::Color::Yellow);
+					shapesArray[x].setFillColor(sf::Color::Yellow);
 					}
 				}
 			}
