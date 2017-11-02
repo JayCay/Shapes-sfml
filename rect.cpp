@@ -34,11 +34,68 @@ sf::RectangleShape drawaabb[9999] ;
 sf::FloatRect oaabb[9999];
 sf::Vector2f colcheck[9999];
 
+//prependicular function
 sf::Vector2f per(sf::Vector2f v){
 	sf::Vector2f per(-v.y, v.x);
 	return per;
 }
+//dot product function
+float dotProduct(sf::Vector2f a, sf::Vector2f b){
+	return ((a.x * b.x) + (a.y * b.y));
+}
 
+
+vector<sf::Vector2f> getAxes(sf::ConvexShape shape, sf::ConvexShape shape2){
+	vector<sf::Vector2f> axesToCheck;
+
+	for(int i = 0; i< shape.getPointCount() - 1; i++)
+	{
+		axesToCheck.push_back(per(shape.getTransform().transformPoint(shape.getPoint(i))- shape.getTransform().transformPoint(shape.getPoint(i+1))));
+	}
+	axesToCheck.push_back(per(shape.getTransform().transformPoint(shape.getPoint(shape.getPointCount() - 1)) - shape.getTransform().transformPoint(shape.getPoint(0))));
+	for(int j = 0; j < shape2.getPointCount() - 1; j++){
+		axesToCheck.push_back(per(shape2.getTransform().transformPoint(shape2.getPoint(j)) - shape2.getTransform().transformPoint(shape2.getPoint(j+1))));
+	}
+	axesToCheck.push_back(per(shape.getTransform().transformPoint(shape2.getPoint(shape2.getPointCount() - 1)) - shape2.getTransform().transformPoint(shape2.getPoint(0))));
+	return axesToCheck;
+}
+//get minumum point
+float getMin(sf::ConvexShape shape, sf::Vector2f u){
+	float shapMin = dotProduct(shape.getTransform().transformPoint(shape.getPoint(0)),u);
+	for(int i = 1;i<shape.getPointCount();i++){
+		float minCheck = dotProduct(shape.getTransform().transformPoint(shape.getPoint(i)),u);
+		if(minCheck < shapMin) shapMin = minCheck;
+	}
+	return shapMin;
+}
+
+//get maximum point
+float getMax(sf::ConvexShape shape, sf::Vector2f u){
+	float shapMax = dotProduct(shape.getTransform().transformPoint(shape.getPoint(0)),u);
+	for(int i = 1;i<shape.getPointCount();i++){
+		float maxCheck = dotProduct(shape.getTransform().transformPoint(shape.getPoint(i)),u);
+		if(maxCheck > shapMax) shapMax = maxCheck;
+	}
+	return shapMax;
+}
+
+//SAT collision check
+bool isSatCollide(sf::ConvexShape shape, sf::ConvexShape shape2)
+{
+	vector<sf::Vector2f> check = getAxes(shape, shape2);
+	int overlapCounter = 0;
+	for(int i = 0; i < check.size(); i++){
+		float shapeMin = getMin(shape, check.at(i));
+		float shape2Min = getMin(shape2, check.at(i));
+		float shapeMax = getMax(shape, check.at(i));
+		float shape2Max = getMax(shape2, check.at(i));
+		if(shape2Min > shapeMax || shape2Max < shapeMin) break;
+		else overlapCounter++;
+	}
+	if(overlapCounter == check.size()) return true; 
+	else return false;
+
+}
 
 
 int main() {
@@ -56,6 +113,7 @@ int main() {
 	int numShapes;
 	cin >> numShapes;
 
+	//draw shapes
 	for (int i = 0; i < numShapes; i++) {
 		int numPoints;
 		cin >> numPoints;
@@ -74,7 +132,7 @@ int main() {
 		oaabb[i] = shapesArray[i].getLocalBounds();
 		shapesArray[i].setOrigin(oaabb[i].left + oaabb[i].width/2, oaabb[i].top + oaabb[i].height/2);
 		shapesArray[i].setFillColor(sf::Color::Green);
-		shapesArray[i].setOutlineColor(sf::Color::Magenta);
+		shapesArray[i].setOutlineColor(sf::Color::Blue);
 		shapesArray[i].setOutlineThickness(2);
 	}
 
@@ -102,10 +160,10 @@ int main() {
 
 		
 		//polygon movement
-		if ( keyUpPressed ) shapesArray[0].move(0,-50*TIMESTEP);
-        if ( keyDownPressed ) shapesArray[0].move(0,50*TIMESTEP);
-        if ( keyLeftPressed ) shapesArray[0].move(-50*TIMESTEP,0);
-        if ( keyRightPressed ) shapesArray[0].move(50*TIMESTEP,0);
+		if ( keyUpPressed ) shapesArray[0].move(0,-80*TIMESTEP);
+        if ( keyDownPressed ) shapesArray[0].move(0,80*TIMESTEP);
+        if ( keyLeftPressed ) shapesArray[0].move(-80*TIMESTEP,0);
+        if ( keyRightPressed ) shapesArray[0].move(80*TIMESTEP,0);
 
 
         //rotate mode toggle
@@ -136,29 +194,17 @@ int main() {
 		drawaabb[i].setSize(sf::Vector2f(aabb[i].width,aabb[i].height));
 		drawaabb[i].setPosition(aabb[i].left,aabb[i].top);
 		drawaabb[i].setFillColor(sf::Color::Transparent);
-		drawaabb[i].setOutlineColor(sf::Color::Red);
+		drawaabb[i].setOutlineColor(sf::Color::Blue);
 		drawaabb[i].setOutlineThickness(1);
 		colcheck[i] = sf::Vector2f(aabb[i].left,aabb[i].top);
 	}
-		//drawing new aabbs
-		/*
-		for ( int i = 0; i < RecSIZE; i++ ){
-		float x_o = oaabb[i].getSize().x;
-		float y_o = oaabb[i].getSize().y;		
-		float x_n = (x_o * abs(cos((angle[i]* M_PI/180)))) + (y_o * abs(sin((angle[i]* M_PI/180))));
-		float y_n = (y_o * abs(cos((angle[i]* M_PI/180)))) + (x_o * abs(sin((angle[i]* M_PI/180))));
-		aabb[i].setSize(sf::Vector2f(x_n,y_n));
-		aabb[i].setOrigin(x_n/2,y_n/2);
-		aabb[i].setPosition(rect[i].getPosition());
-		}
-	*/
-		//default polygon coflor
+		
+		//default polygon color
 		for (int i = 0;i < numShapes;i++){
 			shapesArray[i].setFillColor(sf::Color::Green);
 		}
 
-		//collision detection
-		
+		//aabb collision 
 		for ( int i = 0; i < numShapes; i++ ){
 			sf::Vector2f i2x;
 			for (int x = 0;x < i;x++){
@@ -177,6 +223,19 @@ int main() {
 				}
 			}
 		}
+
+		//SAT collision
+		for(int i = 0; i < numShapes; i++){
+			for(int j = 0; j < numShapes; j++){
+				if(i != j){
+					if(isSatCollide(shapesArray[i], shapesArray[j])){
+						shapesArray[i].setFillColor(sf::Color::Red);
+						shapesArray[j].setFillColor(sf::Color::Red);
+					}
+				}
+			}
+		}	
+
 		
 		window.clear( sf::Color::Black );
 		for ( int i = 0; i < numShapes; i++ ){
